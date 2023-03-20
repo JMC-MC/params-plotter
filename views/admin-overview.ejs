@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <!-- Script -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="/private-static/js/admin/data-table.js"></script>
+        
+        <!-- CSS -->
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+
+    </head>
+    <body>
+        <table id="myTable">
+            <thead>
+              <tr>
+                <th>Created</th>
+                <th>Last Updated</th>
+                <th>Tags</th>
+                <th>Staff Answer</th>
+                <!-- <th>Date Time</th> -->
+              </tr>
+            </thead>
+            <tbody>
+                <% data.forEach(function(row) { %>
+                    <tr data-href="/scenario/<%= row.id %>">
+                        <td><%= row.created_at %></td>
+                        <td><%= row.last_update %></td>
+                        <td><%= row.tags %></td>
+                        <td><%= row.staff_answer %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+    </body>
+</html>

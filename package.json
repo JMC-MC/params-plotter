@@ -1,0 +1,48 @@
+{
+  "name": "daily_scenarios_sender",
+  "version": "1.0.0",
+  "description": "A server that handles daily COLREGs scenarios",
+  "main": "app.js",
+  "engines": {
+    "npm": "6.14.13",
+    "node": "16.16.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "devStart": "npm-run-all --parallel watch:server watch:build",
+    "watch:build": "webpack",
+    "watch:server": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.272.0",
+    "acorn": "^8.8.2",
+    "aws-jwt-verify": "^3.4.0",
+    "axios": "^1.3.4",
+    "cookie-parser": "^1.4.6",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "express-validator": "^6.15.0",
+    "helmet": "^6.0.1",
+    "jquery": "^3.6.3",
+    "lodash.clonedeep": "^4.5.0",
+    "mark.js": "^8.11.1",
+    "npm-run-all": "^4.1.5",
+    "paper": "^0.12.17",
+    "pg": "^8.9.0",
+    "qs": "^6.11.0",
+    "three": "^0.149.0",
+    "webpack": "^5.75.0",
+    "webpack-bundle-analyzer": "^4.8.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0"
+  }
+}
