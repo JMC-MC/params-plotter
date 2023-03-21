@@ -10,13 +10,12 @@ const {
 
 exports.getScenarioPage = async (req, res) => {
   try {
-    // Get data
-    const scenario = await View.getById(req.params.id);
-    const extractedArray = scenario.scenario_object;
+    // Generate Scenario
+    const scenario = await View.generateScenario();
     // Process Data
     let rules = [];
     let htmlList = '';
-    extractedArray.genShipsAfloat.forEach((ship) => {
+    scenario.genShipsAfloat.forEach((ship) => {
       if ('rules' in ship && ship.rules.length > 0) {
         rules = rules.concat(ship.rules);
       }
@@ -26,34 +25,13 @@ exports.getScenarioPage = async (req, res) => {
     });
     // Return data in render
     res.status(200).render('index', {
-      scenarioObject: extractedArray,
+      scenarioObject: scenario,
       importScenNonce: importScenNonce,
       staffAnswer: scenario.staff_answer,
       htmlList: htmlList,
     });
   } catch (error) {
     res.status(404).send('Page not found');
-  }
-};
-
-exports.getAdminOverview = async (req, res) => {
-  try {
-    // Get data
-    const data = await View.getAll();
-    // Return data in render
-    res.status(200).render('admin-overview', {
-      data: data,
-    });
-  } catch (err) {
-    res.status(404).json({ status: 'fail', message: err });
-  }
-};
-
-exports.getAdminGenerator = async (req, res) => {
-  try {
-    // Return page in render
-    res.status(200).render('admin-gen');
-  } catch (err) {
-    res.status(404).json({ status: 'fail', message: err });
+    console.log(error);
   }
 };

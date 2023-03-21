@@ -4,10 +4,10 @@ const BundleAnalyzerPlugin =
   require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
-  entry: './src/admin/app.js',
+  entry: './src/app.js',
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'private/js/admin'),
+    path: path.resolve(__dirname, 'private/js/dist'),
     //sourceMapFilename: '[name].js.map',
   },
   mode: 'production',

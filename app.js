@@ -1,17 +1,12 @@
 const express = require('express');
-// const morgan = require('morgan');
+const morgan = require('morgan');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const xss = require('xss-clean');
 const scenarioRouter = require('./routes/scenarioRoutes');
 const viewRouter = require('./routes/viewRoutes');
-const privateRouter = require('./routes/privateRoutes');
-const user = require('./createUser');
 const { importScenNonce } = require('./middleware/nonce');
-
-// CREATE ADMIN USER
-// user.confirmSignUp();
 
 // CONFIG EXPRESS
 const app = express();
@@ -76,10 +71,15 @@ app.use(express.json({ limit: '10kb' }));
 // Cookie parser
 app.use(cookieParser());
 
+app.use(
+  morgan(
+    ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
+  )
+);
+
 //ROUTES:
 app.use('/', viewRouter);
 app.use('/api/v1/scenarios', scenarioRouter);
-app.use('/private-static', privateRouter);
 // Catch all other routes
 // app.get('*', function (req, res) {
 //   res.status(404).send('Page not found');
