@@ -1995,40 +1995,20 @@ $(document).ready(function () {
 ///////////// Things that happen after clicking Next ////////////////
 
 const completeReport = function () {
-  reqData('PATCH', `${APIURL}api/scenarios/${scenarioId}`, {
-    intentions: intentionsArr,
-    contactReports: contactReports,
-    finalShipsAfloat: shipsAfloat,
-    end: Date.now(),
-  })
-    .then((res) => {
-      if (!question.questionText) {
-        if (getNextScen(urlScen) === 'debrief')
-          location.replace(`http://127.0.0.1:3001/debrief.html`);
-        else
-          location.replace(
-            `http://127.0.0.1:3001/sim.html?scenario=${getNextScen(urlScen)}`
-          );
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  if (urlScen == 'resvis1') {
-    reqData(
-      'PATCH',
-      `${APIURL}api/assessments/${sessionStorage.getItem('assessment_id')}`,
-      {
-        end: Date.now(),
-      }
-    )
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  // The is where the final data gets sent to the API
+  console.log(
+    `intentions: ${intentionsArr} | contactReports: ${contactReports} | finalShipsAfloat: ${shipsAfloat}`
+  );
+  // reqData('PATCH', `${APIURL}api/scenarios/${scenarioId}`, {
+  //   intentions: intentionsArr,
+  //   contactReports: contactReports,
+  //   finalShipsAfloat: shipsAfloat,
+  //   end: Date.now(),
+  // })
+  //   .then((res) => {})
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
 };
 
 // Find reciprocal bearing

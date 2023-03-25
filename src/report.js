@@ -200,7 +200,6 @@ const nextContact = function () {
   const currentReport = contactReports.length - 1;
   contactReports[currentReport].completed = Date.now();
   completedRepsNo.push(contactReports[currentReport].tgtNo);
-  markReport(contactReports[currentReport]);
   // Validation
   // Generate array tgt names that have not been reported yet
   const shipsAfloatNames = window.shipsAfloat.slice(1).map((ship) => ship.name);
@@ -217,8 +216,6 @@ const nextContact = function () {
     contactReports[currentReport].rules.reported = selectedRules;
     // Clear selectedRules
     selectedRules = [];
-    // Mark Report
-    markReport(contactReports[currentReport]);
     // Hide the current tab:
     var x = $('.tab');
     $(x[currentTab]).hide();
@@ -232,7 +229,7 @@ const intentions = function () {
   // Get all checked rules
   $('.checkbox').each(function () {
     if ($(this).is(':checked')) {
-      selectedRule.push($(this).attr('id'));
+      selectedRules.push($(this).attr('id'));
     }
   });
   // Record current contact information
@@ -241,13 +238,25 @@ const intentions = function () {
   completedRepsNo.push(contactReports[currentReport].tgtNo);
   // Add rules
   contactReports[currentReport].rules.reported = selectedRules;
-  // Mark Report
-  markReport(contactReports[currentReport]);
   // Clear selectedRules
   selectedRules = [];
   const x = document.getElementsByClassName('tab');
   completedRepsNo.push(contactReports[currentReport].tgtNo);
   nextPrev(1);
+};
+
+const submitRep = function () {
+  intentionsHandler();
+  // Change visible elements
+  // This function will figure out which tab to display
+  var x = document.getElementsByClassName('tab');
+  // Hide the current tab:
+  x[currentTab].style.display = 'none';
+  //Other elements
+  $('#submit-message').fadeIn();
+  $('#form-btns').toggle();
+  $('#form-circles').toggle();
+  completeReport(intentionsArr);
 };
 
 function fixStepIndicator(n) {
@@ -389,7 +398,7 @@ const intentionsHandler = function () {
   const speedDirection = $('#alterSpeed').val();
   const speedAmount = $('#speedChange').val();
 
-  // Alter own ship based on actions
+  // Alter own ship based on actions to get resultant CPA and TCPA
   //Course
   if (turnAmount > 0 && turnDirection != 'maintain') {
     // Convert to radians
@@ -466,118 +475,8 @@ const intentionsHandler = function () {
       reportDetails: [],
     },
   };
-  // Add notes
-  generateIntNotes(intObj);
   // Add intentions to array ++
   intentionsArr.push(intObj);
-};
-
-const generateIntNotes = function (intObj) {
-  // Notes for PNCT
-  // If there is an action check that this achieves PNCT.
-  if (
-    intObj.turn.amount != 0 ||
-    (intObj.speed.amount != 0 && intObj.pnct.length > 0)
-  ) {
-    intObj.pnct.forEach((el) => {
-      const ship = intObj.reportShipsAfloat.filter(
-        (val) => val.name === el.tgtNo
-      );
-      const shipObj = ship[0];
-      if (shipObj.cpaMiles < el.range) {
-        intObj.notes.reportDetails.push(
-          `The reported action will cause TGT ${el.tgtNo} to pass closer than ${
-            el.range
-          } NM (TGT ${el.tgtNo} Resultant CPA: ${shipObj.cpaMiles.toFixed(1)})`
-        );
-      }
-    });
-  }
-  // If there is a PNCT but no action
-  if (
-    intObj.turn.amount == 0 &&
-    intObj.speed.amount == 0 &&
-    intObj.pnct.length > 0
-  ) {
-    // Check the PNCT against shipsAfloat
-    intObj.pnct.forEach((el) => {
-      const ship = window.shipsAfloat.filter((val) => val.name === el.tgtNo);
-      const shipObj = ship[0];
-      if (shipObj.cpaMiles < el.range) {
-        intObj.notes.reportDetails.push(
-          `On your current course and speed TGT ${
-            el.tgtNo
-          } will pass closer that ${el.range} NM (TGT ${
-            el.tgtNo
-          } CPA: ${shipObj.cpaMiles.toFixed(1)}NM)`
-        );
-      }
-    });
-  }
-  // Check compliance with rules
-  const completedReps = contactReports.filter((el) => {
-    return el.completed > 0;
-  });
-  completedReps.forEach((currentReport) => {
-    // Get rules
-    const rules = currentReport.rules.actual;
-    switch (true) {
-      //Crossing situation own ship is giveway
-      case rules.includes('15') && rules.includes('16'):
-        checkKOW(intObj, currentReport);
-        checkIfXingAhead(intObj, currentReport);
-        break;
-      //Crossing situation own ship is stand-on vessel
-      case rules.includes('15') && rules.includes('17'):
-        checkKCandS(intObj);
-        break;
-      //Own ship is overtaking another vessel
-      case rules.includes('13') && rules.includes('16'):
-        checkKOW(intObj, currentReport);
-        break;
-      //Own ship is being overtaken
-      case rules.includes('13') && rules.includes('17'):
-        checkKCandS(intObj);
-        break;
-      //Own ship in head-on situation
-      case rules.includes('14'):
-        checkTurnStb(intObj, currentReport);
-        break;
-      //Res Vis vessel forward of the beam
-      case rules.includes('19'): // This needs to be revised after trial
-        checkTurnPort(intObj, currentReport);
-        break;
-      ///Res Vis vessel abeam or abaft
-      case rules.includes('19dii'):
-        checkTurnTowards(intObj, currentReport);
-        break;
-    }
-  });
-};
-
-const submitRep = function () {
-  intentionsHandler();
-  // Clear selectedRules
-  selectedRules = [];
-  // Reset form
-  $('#regForm')[0].reset();
-  // Clear rules from drop zone
-  $('#drop-zone').empty();
-  // Change visible elements
-  // This function will figure out which tab to display
-  var x = document.getElementsByClassName('tab');
-  // Hide the current tab:
-  x[currentTab].style.display = 'none';
-  //Other elements
-  $('#submit-message').fadeIn();
-  $('#form-btns').toggle();
-  $('#form-circles').toggle();
-  //clear form
-  setTimeout(() => {
-    modal.style.display = 'none';
-    completeReport();
-    if (question.questionText) launchQuestion();
-  }, 3000);
 };
 
 function handelMultiEls(inputArr) {
@@ -590,6 +489,7 @@ function handelMultiEls(inputArr) {
   });
   return array;
 }
+// Functions for calculating 'actual' report values
 
 function calcCPAside(ship) {
   const relBrng = ship.USNRelAtCPA;
@@ -674,96 +574,7 @@ function bearingChange(shipAtReport) {
   else if (degMin > 0) return 'right';
 }
 
-function markReport(contactReport) {
-  let topLevelKeys = Object.keys(contactReport);
-  // Filter only keys that contain student answers.
-  topLevelKeys = topLevelKeys.filter(
-    (key) => typeof contactReport[key].reported !== 'undefined'
-  );
-
-  topLevelKeys.map((key) => {
-    const el = contactReport[key];
-    ///Special cases
-    if (key === 'held') {
-      console.log(JSON.stringify(el.reported));
-      console.log(JSON.stringify(el.actual));
-      switch (true) {
-        case JSON.stringify(el.reported) == JSON.stringify(el.actual):
-          el.mark.awardedMarks = el.mark.availableMarks;
-          break;
-        case JSON.stringify(el.reported) != JSON.stringify(el.actual):
-          el.mark.awardedMarks = 0;
-      }
-    }
-
-    if (key === 'cpaPos') {
-      switch (true) {
-        case el.reported === el.actual.relPosition:
-          el.mark.awardedMarks = el.mark.availableMarks;
-          break;
-        case el.reported != el.actual.relPosition:
-          el.mark.awardedMarks = 0;
-      }
-    }
-
-    if (key === 'bearingDirection') {
-      switch (true) {
-        case el.reported == el.actual.direction:
-          el.mark.awardedMarks = el.mark.availableMarks;
-          break;
-        case el.reported != el.actual:
-          el.mark.awardedMarks = 0;
-      }
-    }
-    // General cases
-    else {
-      if (
-        el.mark.type === 'binary' &&
-        typeof el.mark.awardedMarks !== 'number'
-      ) {
-        switch (true) {
-          case el.reported == el.actual:
-            el.mark.awardedMarks = el.mark.availableMarks;
-            break;
-          case el.reported != el.actual:
-            el.mark.awardedMarks = 0;
-        }
-      }
-      if (el.mark.type === 'margin') {
-        const diff = Math.abs(el.reported - el.actual);
-        el.mark.accuracy = 100 - Math.abs(diff / el.actual) * 100;
-        // Don't allow accuracies to be negative
-        if (el.mark.accuracy < 0) el.mark.accuracy = 0;
-        switch (true) {
-          case diff <= el.mark.moe:
-            el.mark.awardedMarks = el.mark.availableMarks;
-            break;
-          case diff > el.mark.moe:
-            el.mark.awardedMarks = 0;
-        }
-      }
-      if (el.mark.type === 'compare') {
-        // Mark correct if there is a match.
-        // No Answer
-        if (el.reported.length == 0) el.mark.awardedMarks = 0;
-        // Concat
-        if (el.reported.length > 0) {
-          let concatRules = el.reported.map((val) => {
-            let rule = val.number.toString();
-            // if (Object.keys(val).includes('para')) rule += val.para;
-            // if (Object.keys(val).includes('subPara')) rule += val.subPara;
-            return rule;
-          });
-          let correct = concatRules.filter((val) => el.actual.includes(val));
-          el.mark.correctList = correct;
-          el.mark.awardedMarks = correct.length * el.mark.marksPerRule;
-          // Update available marks
-          el.mark.availableMarks = el.actual.length;
-        }
-      }
-    }
-  });
-}
+// Function for keep track of which contacts have been reported and updating TGT selector options
 
 const updateTgtList = function () {
   // Generate array of ships names from ships afloat
