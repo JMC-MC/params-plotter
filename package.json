@@ -1,7 +1,7 @@
 {
-  "name": "daily_scenarios_sender",
+  "name": "martime-web-app",
   "version": "1.0.0",
-  "description": "A server that handles daily COLREGs scenarios",
+  "description": "An application for training and assessing the collision regulations",
   "main": "app.js",
   "engines": {
     "npm": "6.14.13",
@@ -29,6 +29,7 @@
     "express-validator": "^6.15.0",
     "helmet": "^6.0.1",
     "jquery": "^3.6.3",
+    "jquery-ui": "^1.13.2",
     "lodash.clonedeep": "^4.5.0",
     "mark.js": "^8.11.1",
     "npm-run-all": "^4.1.5",

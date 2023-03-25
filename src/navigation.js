@@ -1,3 +1,11 @@
+import {
+  showTab,
+  startAgain,
+  nextPrev,
+  nextContact,
+  intentions,
+  submitRep,
+} from './report';
 // When document is ready
 $(function () {
   // Navigation
@@ -35,29 +43,24 @@ $(function () {
     $('#debrief-view').hide();
     updateTgtList();
   });
+  // Report View
 
   $('#report-button').on('touchstart mousedown', function () {
-    console.log('fired');
-    // Switch Screens
-    $('#radar').hide();
-    $('#lookOut').hide();
-    $('#rules-view').hide();
-    $('#staff-answer').show();
+    $('#myModal').show();
+    showTab();
   });
 
-  // JQuery Document ready
-  $(document).on('mousedown', '.rule-link', function () {
-    // Switch Screens
-    $('#radar').hide();
-    $('#lookOut').hide();
-    $('#rules-view').show();
-    $('#staff-answer').hide();
-    const rule = $(this).attr('at');
-    $([document.documentElement, document.body]).animate(
-      {
-        scrollTop: $('#' + rule).offset().top - 100,
-      },
-      2000
-    );
+  $('.close').on('touchstart mousedown', function () {
+    $('#myModal').hide();
   });
+  $('#resetBtn').on('mousedown touchstart', startAgain);
+
+  $('#nextBtn').on('mousedown touchstart', function () {
+    nextPrev(1);
+  });
+  $('#nextCnt').on('mousedown touchstart', nextContact);
+
+  $('#actionBtn').on('mousedown touchstart', intentions);
+
+  $('#submitBtn').on('mousedown touchstart', submitRep);
 });

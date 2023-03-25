@@ -51,6 +51,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/w3-css/4.1.0/w3.css"
     />
     <link rel="stylesheet" href="/styles/main.css" />
+    <link rel="stylesheet" href="/styles/assess-form.css" />
     <link
       rel="stylesheet"
       href="https://kit.fontawesome.com/60d94bcdaf.css"
@@ -1972,23 +1973,437 @@
         </div>
       </div>
     </div>
-    <div id="staff-answer">
-      <h2>Staff Answer:</h2>
-      <p><%- staffAnswer %></p>
-      <h2>Applicable Rules:</h2>
-      <ul class="rules-list">
-        <%- htmlList %>
-      </ul>
-    </div>
+    <!-- The Modal -->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+      <div class="close">&times;</div>
+      <form id="regForm" action="">
+          <!-- One "tab" for each step in the form: -->
+          <div class="tab">
+            <h3>Select Target</h3>
+            <label>TGT Number</label>
+              <select id="tgtSelector">
+                  <!-- <option value="001">001</option>
+                  <option value="002">002</option>
+                  <option value="003">003</option>
+                  <option value="004">004</option>
+                  <option value="005">005</option> -->
+              </select>
+          </div>
+          <div class="tab">
+              <h3>Fill out report details</h3>
+              <div class = "report-row">At <select id="relColour">
+                      <option value="green">green</option>
+                      <option value="red">red</option>
+                      <option value="ship's head">ship's head</option>
+                      <option value="astern">astern</option>
+
+                  </select>
+                  <span id="relBearingCont"><input id="relBearing" type ="number" placeholder="5" min="0" max="180" step="1"> &deg;</span>
+                  range <input id = "range" class="decPlace" type ="number" min="0" placeholder="11.0" step="0.1" > NM
+                </div>
+                <div class = "report-row">I have a <select id = "type-vis">
+                  <option value="PDV">PDV</option>
+                  <option value="SV">SV</option>
+                  <option value="SV">VEIF</option>
+                  <option value="RAM">RAM</option>
+                  <option value="RAM">NUC</option>
+              </select>
+              <select id = "type-resvis">
+                <option value="PDV - making way">PDV - making way</option>
+                <option value="PDV - underway not making way">PDV - under way not making way</option>
+                <option value="lame-duck"> NUC,RAM,CBD,SV,VEIF,Towing/Pushing</option>
+                <option value="anchorless100m">Anchored less than 100M</option>
+                <option value="anchormore100m">Anchored more than 100M</option>
+                <option value="aground">Aground</option>
+                <option value="pilot vessel">Pilot vessel</option>
+            </select>
+              held by 
+              <input type="checkbox" id="visual" name="visual">
+              <label class = "regular-font" for="visual"> visual</label>
+              <input type="checkbox" id="radar-box" name="radar">
+              <label class = "regular-font" for="radar"> radar</label>
+              <!-- <input type="checkbox" id="AIS" name="AIS">
+              <label class = "regular-font" for="AIS">AIS</label> -->
+            </div>
+            <div class = "report-row">
+                I am 
+                <span id="aspectBearingCont"><input id = "aspectBearing" type ="number" placeholder="5" min="0" max="180" step="1"> &deg;</span>
+                on her
+                <select id = "aspectSide">
+                  <option value="port">port</option>
+                  <option value="stb">stb</option>
+                  <option value="ship's head">ship's head</option>
+                  <option value="stern">stern</option>
+
+                </select><span id="bow"> bow </span>
+              </div>
+              <div class = "report-row">
+                Her bearing is drawing 
+                <!-- <select id = "bearingMoveSpeed">
+                  <option selected value> -- blank -- </option>
+                  <option value="slowly">slowly</option>
+                  <option value="quickly">quickly</option>
+                </select> -->
+                <select id = "bearingDirection" >
+                  <option value="steady">steady</option>
+                  <option value="left">left</option>
+                  <option value="right">right</option>
+                </select>
+              </div>
+              <div class = "report-row">
+                She has a CPA of
+                <input class="decPlace"  type ="number" min="0" id = "cpa" placeholder="1.0" step="0.1"> NM 
+                on my
+                <select id = "cpaSide">
+                  <option selected value = "-- blank --">-- blank --</option>
+                  <option value="port">port</option>
+                  <option value="stb">stb</option>
+                </select> 
+                <select id ="cpaPos" >
+                  <option value="ship's head">ship's head</option>
+                  <option value="bow">bow</option>
+                  <option value="beam">beam</option>
+                  <option value="quarter">quarter</option>
+                  <option value="stern">stern</option>
+                </select>
+                in
+                <input type ="number" min="0" id = "tcpa" placeholder="1" step="1"> mins  
+              </div>
+          </div>
+          <div class="tab">
+            <h3>Check all relevant rules...</h3>
+            <div class="container-report">
+                  <ul class="tree">
+                    <li>
+                      <input type="checkbox" class="checkbox" id="9" />
+                      <span class="expand">9. Narrow Channels</span>
+                      <ul>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="9a" />
+                          (a) A vessel proceeding along ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="9b" />
+                          (b) A vessel of less ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="9c" />
+                          (c) A vessel engaged in ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="9d" />
+                          (d) A vessel shall not ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="9e" />
+                          <span class="expand">9(e)</span>
+                          <ul>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="9ei" />
+                              (i) In a narrow channel ...
+                            </li>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="9eii" />
+                              (ii) This Rule does not ...
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="9f" />
+                          (f) A vessel nearing a ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="9g" />
+                          (g) Any vessel shall, if ...
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <input type="checkbox" class="checkbox" id="10" />
+                      <span class="expand">10. Traffic Separation Schemes</span>
+                      <ul>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="10a" />
+                          (a) This Rule applies to ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="10b" />
+                          <span class="expand">10(b)</span>
+                          <ul>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="10bi" />
+                              (i) proceed in the appropriate ...
+                            </li>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="10bii" />
+                              (ii) so far as practicable ...
+                            </li>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="10biii" />
+                              (iii) normally join or leave ...
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <input type="checkbox" class="checkbox" id="12" />
+                      <span class="expand">12. Sailing Vessels</span>
+                      <ul>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="12a" />
+                          <span class="expand">12(a)</span>
+                          <ul>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="12ai" />
+                              (i) when each has the ...
+                            </li>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="12aii" />
+                              (ii) when both have the ...
+                            </li>
+                            <li>
+                              <input type="checkbox" class="checkbox" id="12aiii" />
+                              (iii) if a vessel with ...
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="12b" />
+                          (b) For the purposes of ...
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <input type="checkbox" class="checkbox" id="13" />
+                      <span class="expand">13. Overtaking</span>
+                      <ul>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="13a" />
+                          (a) Notwithstanding anything contained ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="13b" />
+                          (b) A vessel shall be ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="13c" />
+                          (c) When a vessel is in ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="13d" />
+                          (d) Any subsequent alteration of ...
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <input type="checkbox" class="checkbox" id="14" />
+                      <span class="expand">14. Head-on</span>
+                      <ul>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="14a" />
+                          (a) When two power-driven ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="14b" />
+                          (b) Such a situation shall ...
+                        </li>
+                        <li>
+                          <input type="checkbox" class="checkbox" id="14c" />
+                          (c) When a vessel is in ...
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <input type="checkbox" class="checkbox" id="15" />
+                      <span>15. Crossing Situation</span>
+                    </li>
+                    <li>
+                      <input type="checkbox" class="checkbox" id="16" />
+                      <span>16. Action by giveway vessel</span>
+                  </li>
+                  <li>
+                      <input type="checkbox" class="checkbox" id="17" />
+                      <span class="expand">17. Action by stand-on vessel</span>
+                      <ul>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="17a" />
+                              <span class="expand">(a)</span>
+                              <ul>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="17ai" />
+                                      (i) Where one of two ...
+                                  </li>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="17aii" />
+                                      (ii) The latter vessel may ...
+                                  </li>
+                              </ul>
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="17b" />
+                              (b) When, from any cause ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="17c" />
+                              (c) A power-driven vessel ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="17d" />
+                              (d) This Rule does not ...
+                          </li>
+                      </ul>
+                  </li>
+                  <li>
+                      <input type="checkbox" class="checkbox" id="18" />
+                      <span class="expand">18. Responsibilities between vessels</span>
+                      <ul> 
+                          <li>
+                              <input type="checkbox" class="checkbox" id="18a" />
+                              (a) A power-driven vessel underway ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="18b" />
+                              (b) A sailing vessel underway ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="18c" />
+                              (c) A vessel engaged in fishing ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="18d" />
+                              <span class="expand">(d)</span>
+                              <ul>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="18di" />
+                                      (i) Any vessel other than ...
+                                  </li>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="18dii" />
+                                      (ii) A vessel constrained ...
+                                  </li>
+                              </ul>
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="18e" />
+                              (e) A seaplane on the ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="18f" />
+                              <span class="expand">(f)</span>
+                              <ul>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="18fi" />
+                                      (i) A WIG craft shall ...
+                                  </li>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="18fii" />
+                                      (ii) A WIG craft operating ...
+                                  </li>
+                              </ul>
+                          </li>
+                      </ul>        
+                  </li>
+                  <li>
+                      <input type="checkbox" class="checkbox" id="19" />
+                      <span class="expand">19. Restricted Visibility</span>
+                      <ul>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="19a" />
+                              (a) This Rule applies to ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="19b" />
+                              (b) Every vessel shall proceed ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="19c" />
+                              (c) Every vessel shall have ...
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="19d" />
+                              <span class="expand">(d)</span>
+                              <ul>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="19di" />
+                                      (i) an alteration of course ...
+                                  </li>
+                                  <li>
+                                      <input type="checkbox" class="checkbox" id="19dii" />
+                                      (ii) an alteration of course ...
+                                  </li>
+                              </ul>
+                          </li>
+                          <li>
+                              <input type="checkbox" class="checkbox" id="19e" />
+                              (e) Except where it has ...
+                          </li>
+                      </ul>       
+                  </li>
+              <ul>
+            </div>
+          </div>
+          <div class="tab">
+            <h3>My intention is to...</h3>
+            <p>
+              <label for="alterCrse">Turn</label>
+              <select id="alterCrse">
+                <option value="maintain">maintain</option>
+                <option value="port">port</option>
+                <option value="starboard">stb</option>
+              </select>
+              <span id="crseChangeGroup">
+                by
+                <input type="number" id="crseChange" min="0" placeholder="0">
+                &deg;
+              </span>
+            </p>
+            <p>
+              <label for="alterSpeed">Speed</label>
+              <select id="alterSpeed">
+                <option value="maintain">maintain</option>
+                <option value="increase">increase</option>
+                <option value="decrease">decrease</option>
+              </select>
+              <span id="spdChangeGroup">
+                by
+                <input type="number" id="speedChange" min="0" placeholder="0">
+                KTS
+              </span>
+            </p>
+            <p><label>Rereport <span id="addRereport"><i class="fa-solid fa-circle-plus addButton"></i></label>
+            <div id="Rereports"></div></p>
+            <p><label>Pass no closer than ... <span id="addAgreement"><i class="fa-solid fa-circle-plus addButton"></i></span></label>
+            <div id="agreements"></div></p>
+            </div>
+            <div id ="submit-message" class="centre-everything">
+              <h3>Report Submitted <i class="fa-duotone fa-thumbs-up color-icon thumbsUp"></i></h3>
+            </div>
+          <div id= "form-btns">
+            <div class ="float-right">
+              <button type="button" id="resetBtn">Start Again</button>
+              <button type="button" id="nextBtn" >Next</button>
+              <button type="button" id="nextCnt" >Next Contact</button>
+              <button type="button" id="actionBtn" >Intentions</button>
+              <button type="button" id="submitBtn" >Submit</button>
+            </div>
+          </div>
+          
+          <!-- Circles which indicates the steps of the form: -->
+          <div id="form-circles">
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+          </div> 
+          </form>
+  </div>
+  </div>
 
     <div class="nav-bar">
       <ul>
-        <li id="bckBttnCntr">
-          <a id="back-button" class="nav-item"
-            ><i class="fa-light fa-arrow-left"></i>
-            <p>back</p></a
-          >
-        </li>
         <li id="rdrBttnCntr">
           <a id="radar-button" class="nav-item"
             ><i class="fa-light fa-radar"></i>
@@ -2007,21 +2422,8 @@
             <p>rules</p></a
           >
         </li>
-        <li id="reprtBttnCntr">
-          <a id="report-button" class="nav-item"
-            ><i class="fa-light fa-phone"></i>
-            <p>Staff Answer</p></a
-          >
-        </li>
+        <li id="reprtBttnCntr" ><a id="report-button" class="nav-item"><i class="fa-light fa-phone"></i><p>report</p></a></li>
       </ul>
-    </div>
-    <!-- The Modal -->
-    <div id="myQuestion" class="modal">
-      <!-- Modal content -->
-      <div id="question-content" class="modal-content">
-        <h3>Staff Answer</h3>
-        <p class="staffAnswer"></p>
-      </div>
     </div>
   </body>
   <footer></footer>

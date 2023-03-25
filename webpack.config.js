@@ -7,7 +7,7 @@ module.exports = {
   entry: './src/app.js',
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'private/js/dist'),
+    path: path.resolve(__dirname, 'public/js/dist'),
     //sourceMapFilename: '[name].js.map',
   },
   mode: 'production',
@@ -21,6 +21,8 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery',
     }),
     new BundleAnalyzerPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),

@@ -1,9 +1,10 @@
 // Import own modules
 import { reqData, APIURL } from './requests.js';
-//import { buildThreeDRendering } from './3dmodv2.js';
 // import paper from 'paper';
 import cloneDeep from 'lodash/cloneDeep';
 import { mark, unmark } from 'markjs';
+import './report.js';
+import { updateTgtList } from './report.js';
 import './navigation.js';
 
 // Make the paper scope global, by injecting it into window:
@@ -243,20 +244,9 @@ import('paper').then(({ default: paper }) => {
 
     // Create deep nested clone of shipsAfloat that scenario can be reset to.
     orgShipsAfloat = cloneDeep(shipsAfloat);
+    updateTgtList();
 
     ////////// Populate debrief card //////////
-
-    $('#debrief-button').mousedown(function () {
-      reqData('PATCH', `${APIURL}api/scenarios/${scenarioId}`, {
-        intentions: intentionsArr,
-        contactReports: contactReports,
-        end: Date.now(),
-      })
-        .then((res) => {})
-        .catch((error) => {
-          console.log(error);
-        });
-    });
 
     // Change form for resVis
     if (window.resVis) {
@@ -268,40 +258,6 @@ import('paper').then(({ default: paper }) => {
     }
 
     scenarioStart = Date.now();
-
-    // Create scenario in DB
-    // reqData('post', `${APIURL}api/scenarios`, {
-    //   userId: sessionStorage.getItem('user_id'),
-    //   assessmentId: sessionStorage.getItem('assessment_id'),
-    //   live: true,
-    //   name: urlScen,
-    //   orgShipsAfloat: orgShipsAfloat,
-    //   start: Date.now(),
-    //   resVis: window.resVis,
-    //   elevation: window.elevation,
-    // })
-    //   .then((res) => {
-    //     scenarioId = res.data._id;
-    //     // Add scenario to assessment document.
-    //     reqData(
-    //       'PATCH',
-    //       `${APIURL}api/assessments/${sessionStorage.getItem(
-    //         'assessment_id'
-    //       )}/scenario`,
-    //       {
-    //         scenarios: scenarioId,
-    //       }
-    //     )
-    //       .then((res) => {})
-    //       .catch((error) => {
-    //         console.log(error);
-    //       });
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-
-    // Record start time
     revealScenario();
     import('./3dmodv2.js').then((res) => {
       res.buildThreeDRendering();
