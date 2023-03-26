@@ -1,5 +1,5 @@
 // Import values from app
-import { calcvecLength, calcCPA, completeReport } from './app.js';
+import { calcvecLength, calcCPA } from './app.js';
 import cloneDeep from 'lodash/cloneDeep';
 // JQUERY adjustment to get number for number inputs
 $.valHooks.number = {
@@ -273,7 +273,6 @@ function updateContactReports() {
   const currentReport = contactReports.length - 1;
   // Clone shipsAfloat
   reportShipsAfloat = cloneDeep(window.shipsAfloat);
-  console.log(contactReports);
   // Clone current details for contact
   let realContDetails = reportShipsAfloat.find(
     (el) => el.name == $('#tgtSelector').val()
@@ -327,7 +326,6 @@ function updateContactReports() {
   contactReports[currentReport].tcpa.actual = realContDetails.tcpa.toFixed(1);
   //Rules
   contactReports[currentReport].rules.actual = realContDetails.rules;
-  console.log(contactReports[currentReport]);
 
   // On second tab add report details
   if (currentTab == 2) {
@@ -357,10 +355,7 @@ function updateContactReports() {
 }
 
 function showTab() {
-  console.log(currentTab);
   // This function will display the specified tab of the form...
-  // var x = document.getElementsByClassName('tab');
-  // x[n].style.display = 'block';
   let n = currentTab;
   var x = $('.tab');
   x.eq(n).show();
@@ -630,7 +625,6 @@ $(function () {
     $('#Rereports').append(
       `<div class = "listEl-rr" data="${id}">Contact No. <select id= "${id}">${options}</select> at <input type="number" min = "0" step = "0.1" placeholder = "1.0"> NM <span class="removeEl">x</span> </div>`
     );
-    console.log(reReportsArr);
   });
 
   $('#addAgreement').on('click', function () {
@@ -688,6 +682,23 @@ $(function () {
     }
   });
 });
+
+const completeReport = function () {
+  // The is where the final data gets sent to the API
+  console.log(intentionsArr);
+  console.log(contactReports);
+  console.log(window.shipsAfloat);
+  // reqData('PATCH', `${APIURL}api/scenarios/${scenarioId}`, {
+  //   intentions: intentionsArr,
+  //   contactReports: contactReports,
+  //   finalShipsAfloat: shipsAfloat,
+  //   end: Date.now(),
+  // })
+  //   .then((res) => {})
+  //   .catch((error) => {
+  //     console.log(error);
+  //   });
+};
 
 export {
   updateTgtList,

@@ -44,32 +44,7 @@ import('paper').then(({ default: paper }) => {
       onemile = shortDim / (scale * 2);
     }
 
-    // Setting menu
-
-    // New Scenario
-    $('#newScn, #newScn_sec').click(function () {
-      // Clear canvas
-      project.activeLayer.removeChildren();
-      shipsAfloat = [];
-      // Generate new ships
-      genOwnShip();
-      genScenario(noCols, noTgts, cpaThres, tcpaThres);
-    });
-    // Edit mode
-    // Edit mode on
-    $('#edit, #edit_sec').click(function () {
-      // On click make border red
-      $('#display-area').css('border-color', '#bf1a49');
-      $('#ctrl-bar').removeClass('w3-hide');
-    });
-    // Edit mode off
-    $('#exit').click(function () {
-      // On click make border red
-      $('#display-area').css('border-color', '#606060');
-      $('#ctrl-bar').addClass('w3-hide');
-    });
-
-    // Range
+    // Adjust range/vectors function
     $('#minus-range, #minus-range-sec').click(function () {
       // Confirm request is within limits
       if (scale > 1.5) {
@@ -138,14 +113,6 @@ import('paper').then(({ default: paper }) => {
         ship.position = ship.position.add(event.delta.divide(2));
         ship.vecEnd = ship.vecEnd.add(event.delta.divide(2));
         drawShip(ship);
-      }
-      // Change orgShipAfloat positions to match new canvas size.
-      // These positions are edited seperately so that the user can interact with the ship then resize the screen
-      // then recover the org scenario but with the new canvas size.
-      for (var i = 0; i < orgShipsAfloat.length; i++) {
-        var ship = orgShipsAfloat[i];
-        ship.position = ship.position.add(event.delta.divide(2));
-        ship.vecEnd = ship.vecEnd.add(event.delta.divide(2));
       }
     };
 
@@ -219,20 +186,14 @@ import('paper').then(({ default: paper }) => {
       $('#ship').css('background-color', 'white');
     };
 
-    // Once all element are loaded draw RR
+    // Once all element are loaded draw range rings on radar
     getScale();
     drawRR();
 
-    // Deal with Url data
-    if (urlParams.has('data')) {
-      urlData = JSON.parse(window.atob(urlParams.get('data')));
-    }
-    // Generate Scenario
-
+    // Load Scenario
     checkData();
 
     // Record bearings every 0.5 secs. Stop recoding after 10 bearings
-
     setInterval(function () {
       if (shipsAfloat[1].bearings.length < 10) {
         for (var i = 1; i < shipsAfloat.length; i++) {
@@ -242,13 +203,11 @@ import('paper').then(({ default: paper }) => {
       }
     }, 500);
 
-    // Create deep nested clone of shipsAfloat that scenario can be reset to.
+    // Create deep nested clone of shipsAfloat for record of original scenario
     orgShipsAfloat = cloneDeep(shipsAfloat);
     updateTgtList();
 
-    ////////// Populate debrief card //////////
-
-    // Change form for resVis
+    // Change form if in restricted visibility mode
     if (window.resVis) {
       $('#type-vis').hide();
       $('#type-resvis').show();
@@ -264,40 +223,22 @@ import('paper').then(({ default: paper }) => {
     });
   };
 });
-//////////////////// Things that can happen before load ///////////////////
 
 //Set Ships Vector Length in Mins
 var ShipVctrLngth = 6;
 // Declare Default scenario settings
 var onemile;
-var noTgts;
-var noCols;
-var cpaThres;
-var tcpaThres;
 
 // Array for ships on canvas
 // Original ships, used on reset
-window.orgShipsAfloat = [];
+let orgShipsAfloat = [];
 // ships that are updated when moved.
 window.shipsAfloat = [];
-// Global var for start time
-window.scenarioStart = '';
-
-// Vessel types in scenario
-var tgtTypes = ['PDV', 'SV', 'VEIF', 'NUC', 'RAM'];
-
-// Get URL Parms
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const urlScen = urlParams.get('scenario');
-let urlData = [];
-
-// Create variable for scenario ID
-
-var scenarioId = '';
-var question = '';
+// Start time
+let scenarioStart = '';
 
 // Functions for display settings
+
 // Display scale
 
 function upDateScale(direction) {
@@ -373,7 +314,6 @@ function updateVecLen(direction) {
 }
 
 // Functions for Ships
-//TODO: Check accuracy and performance of the animation code.
 // Move shipsAfloat
 const updateShips = function (delta) {
   const deltaSecs = delta / 1000;
@@ -425,11 +365,6 @@ const importScenario = function (data) {
   // Reposition all ships based on screen centre
   data.genShipsAfloat.map((ship) => {
     // Convert all arrays with first value 'point' to paperjs Points
-    // Object.keys(ship).map((val) => {
-    //   if (typeof ship.val === 'Array' && ship.val[0] === 'Point') {
-    //     console.log(val);
-    //   }
-    // });
     // Intialise paperjs point
     ship.position = new Point(ship.position[1], ship.position[2]);
     ship.position = ship.position.add(delta);
@@ -452,20 +387,7 @@ const importScenario = function (data) {
     drawShip(ship);
   });
 };
-
-// Functions for picking random numbers
-function randomIntFromInterval(min, max) {
-  // min and max included
-  return Math.random() * (max - 1 - min + 1) + min;
-}
-//Return whole number
-function getRandomArbitrary(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// Functions for calculating speeds and distance
+// Functions for calculating speeds and distances
 function pixelsToMiles(pixels) {
   const distanceInMiles = pixels / onemile;
   return distanceInMiles;
@@ -487,208 +409,6 @@ function calcvecLength(speed) {
   const miles = (speed / 60) * ShipVctrLngth;
   const distanceInPixels = MilesTopixels(miles);
   return distanceInPixels;
-}
-
-// Create own ship
-function OwnShip(positionX, positionY, vecEndX, vecEndY, course, speed, type) {
-  this.position = new Point(positionX, positionY);
-  this.vecEnd = new Point(vecEndX, vecEndY);
-  this.type = type;
-  this.vector = this.position.subtract(this.vecEnd);
-  this.posSelected = false;
-  this.vecSelected = false;
-  this.course = course;
-  this.speed = speed;
-  shipsAfloat.push(this);
-}
-
-// Create ship
-function Ship(
-  positionX,
-  positionY,
-  vecEndX,
-  vecEndY,
-  name,
-  type,
-  course,
-  rules,
-  speed,
-  toBeReported,
-  typeSound
-) {
-  this.position = new Point(positionX, positionY);
-  this.vecEnd = new Point(vecEndX, vecEndY);
-  this.vector = this.position.subtract(this.vecEnd);
-  this.speed = speed;
-  this.course = course;
-  this.type = type;
-  this.typeSound = typeSound;
-  this.posSelected = false;
-  this.vecSelected = false;
-  this.targetSelected = false;
-  this.editSelected = false;
-  this.vecOwnShip = this.position.subtract(shipsAfloat[0].position);
-  this.OwnShipAngle = this.vecOwnShip.angle;
-  this.relposXnm = pixelsToMiles(this.vecOwnShip.x);
-  this.relposYnm = pixelsToMiles(this.vecOwnShip.y);
-  this.range = pixelsToMiles(this.vecOwnShip.length);
-  this.name = name;
-  this.cpa;
-  this.tcpa;
-  this.rules = rules;
-  this.bearings = [];
-  this.bearingsTaken = [];
-  this.selectCount = 0;
-  this.toBeReported = toBeReported;
-}
-
-function randSampleNoRtrn(list) {
-  var randomIndex = Math.floor(Math.random() * list.length);
-  return list.splice(randomIndex, 1)[0];
-}
-
-function createTgts(numberTgts) {
-  for (var i = 0; i < numberTgts; i++) {
-    var type = 'N/A';
-    var speed = randomIntFromInterval(2.0, 28.0);
-    var vecLength = calcvecLength(speed);
-    var posX = randomIntFromInterval(10, myCanvas.width / 2 - 10);
-    var posY = randomIntFromInterval(10, myCanvas.height / 2 - 10);
-    var course = randomIntFromInterval(0, 2 * Math.PI);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'N/A';
-    return new Ship(posX, posY, endX, endY, name, type, course);
-  }
-}
-
-function assignTypes(tgtTypes) {
-  tgtTypesCopy = _.clone(tgtTypes);
-  // Loop through ships in ships afloat
-  for (var i = 1; i < shipsAfloat.length; i++) {
-    var ship = shipsAfloat[i];
-    // Logic for picking vessel type
-    // Number of targets is the same as number of types
-    if (shipsAfloat.length == tgtTypes.length) {
-      //Take a diffenrt tgtTypes for each target
-      ship.type = tgtTypes[i - 1];
-    }
-    // Number of targets is less than number of types
-    if (shipsAfloat.length < tgtTypes.length) {
-      //Pick a different tgtTypes for each target without replacement
-      ship.type = randSampleNoRtrn(tgtTypesCopy);
-    }
-    // Number of targets is more than number of types
-    if (shipsAfloat.length > tgtTypes.length) {
-      //Pick a different tgtTypes for each target without replacement until list is empty.
-      if (tgtTypesCopy.length > 0) {
-        ship.type = randSampleNoRtrn(tgtTypesCopy);
-      } else {
-        // After working through the list of tgtTypes
-        // Make every target the first one on the tgtType list
-        ship.type = tgtTypes[0];
-      }
-    }
-  }
-}
-
-function genOwnShip() {
-  var speed = randomIntFromInterval(5, 23);
-  var vecLength = calcvecLength(speed);
-  var posX = myCanvas.getBoundingClientRect().width / 2;
-  var posY = myCanvas.getBoundingClientRect().height / 2;
-  var course = randomIntFromInterval(0, 2 * Math.PI);
-  var endX = Math.cos(course) * vecLength + posX;
-  var endY = Math.sin(course) * vecLength + posY;
-  new OwnShip(posX, posY, endX, endY, course, speed, 'Own Ship');
-}
-
-function genScenario(numberCols, numberTgts, cpaThres, tcpaThres) {
-  // The number of collisions must be less than the number of targets
-  if (numberCols > numberTgts) {
-    alert('There cannot be more collisions that targets');
-  } else {
-    // Generate and check tgts until there are enough collisions .
-    colCount = 0;
-    while (colCount < numberCols) {
-      // Create a single target
-      var newShip = createTgts(1);
-      // Does the contact meet the require CPA,TCPA and Range criteria.
-      // If yes check that they are atleast 0.5 miles from other ships afloat.
-      calcCPA(newShip, shipsAfloat[0]);
-      vecOwnShip = newShip.position.subtract(shipsAfloat[0].position);
-      var range = pixelsToMiles(Math.round(vecOwnShip.length));
-      if (
-        pixelsToMiles(newShip.cpa) < cpaThres &&
-        newShip.tcpa > 0 &&
-        newShip.tcpa < tcpaThres &&
-        range > 0.8
-      ) {
-        // If there is one Tgt check ranges
-        if (shipsAfloat.length > 2) {
-          var ranges = [];
-          for (var i = 1; i < shipsAfloat.length; i++) {
-            var ship = shipsAfloat[i];
-            // Get distance to ship
-            vecToNewShip = newShip.position.subtract(ship.position);
-            var rangeToNewShip = pixelsToMiles(Math.round(vecToNewShip.length));
-            ranges.push(rangeToNewShip);
-          }
-          if (Math.min.apply(Math, ranges) > 0.5) {
-            // Add to shipsAfloat and colCount
-            colCount++;
-            shipsAfloat.push(newShip);
-          }
-        }
-        // There are no tgts, add first one.
-        else {
-          colCount++;
-          shipsAfloat.push(newShip);
-        }
-      }
-    }
-
-    // All collision have been created add other tgts to meet numberTgts
-    while (shipsAfloat.length - 1 < numberTgts) {
-      // Create a single target
-      newShip = createTgts(1);
-      // Does the contact not meet the risk of collision criteria
-      // If yes check that they are at least 0.5 miles from other ships afloat.
-      calcCPA(newShip, shipsAfloat[0]);
-      if (pixelsToMiles(newShip.cpa) > cpaThres && range > 0.8) {
-        if (shipsAfloat.length > 2) {
-          var ranges = [];
-          for (var i = 1; i < shipsAfloat.length; i++) {
-            var ship = shipsAfloat[i];
-            vecToNewShip = newShip.position.subtract(ship.position);
-            var rangeToNewShip = pixelsToMiles(Math.round(vecToNewShip.length));
-            ranges.push(rangeToNewShip);
-          }
-          if (Math.min.apply(Math, ranges) > 0.5) {
-            // Add to shipsAfloat and colCount
-            shipsAfloat.push(newShip);
-          }
-        }
-      }
-    }
-
-    // Assign Tgt Types
-    assignTypes(tgtTypes);
-    // Add Tgt names and draw each ship
-    for (var i = 0; i < shipsAfloat.length; i++) {
-      var ship = shipsAfloat[i];
-      if (ship.name == 'CNX') {
-        ship.name = 'CNX';
-      } else {
-        if (i > 0 && i < 10) ship.name = '00' + i;
-        if (i > 9) ship.name = '0' + i;
-      }
-      if (i == 1) ship.targetSelected = true;
-      drawShip(ship);
-    }
-    // Create deep nested clone of shipsAfloat that scenario can be reset to.
-    orgShipsAfloat = _.cloneDeep(shipsAfloat);
-  }
 }
 
 // Calculate CPA from own ship
@@ -745,7 +465,7 @@ function calcCPA(ship, ownship) {
 }
 
 // Convert Vector angles to compass bearing
-window.convertAngle = function (angle) {
+const convertAngle = function (angle) {
   if (angle >= -90 && angle <= 180) return (angle += 90);
   else return (angle += 450);
 };
@@ -762,225 +482,6 @@ function addoos(bearing) {
     return BrngAsString;
   }
 }
-
-//Create objects for each scenario
-
-const basicDay = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 2,
-  },
-  Func2: {
-    Name: createXSit,
-    Par: false,
-  },
-  Func3: {
-    Name: createXSit,
-    Par: true,
-  },
-  Func4: {
-    Name: createOTSit,
-    Par: true,
-  },
-  Func5: {
-    Name: createOTSit,
-    Par: false,
-  },
-  Func6: {
-    Name: createHOSit,
-    Par: null,
-  },
-  Func7: {
-    Name: createHOSit,
-    Par: null,
-  },
-  elevation: 3,
-  resVis: false,
-  randomSelect: function () {
-    // Get all keys in array
-    let keys = Object.keys(this);
-    // Remove first and last keys
-    keys = keys.slice(1);
-    keys = keys.slice(0, -4);
-    // Get number from 1 - end of keys
-    const ranInt = getRandomArbitrary(0, keys.length - 1);
-    //Return object
-    return this[keys[ranInt]];
-  },
-  question: {
-    questionText:
-      'In determining "risk of collision" what does rule 7(d)(i) say about when risk of collision "shall be deemed to exist"?',
-    answer:
-      'if the compass bearing of an approaching vessel does not appreciably change',
-  },
-};
-const basicNight = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 3,
-  },
-  Func2: {
-    Name: createXSit,
-    Par: false,
-  },
-  Func3: {
-    Name: createXSit,
-    Par: true,
-  },
-  Func4: {
-    Name: createOTSit,
-    Par: true,
-  },
-  Func5: {
-    Name: createOTSit,
-    Par: false,
-  },
-  Func6: {
-    Name: createHOSit,
-    Par: null,
-  },
-  Func7: {
-    Name: createHOSit,
-    Par: null,
-  },
-  elevation: -90,
-  resVis: false,
-  randomSelect: function () {
-    // Get all keys in array
-    let keys = Object.keys(this);
-    // Remove first and last keys
-    keys = keys.slice(1);
-    keys = keys.slice(0, -4);
-    // Get number from 1 - end of keys
-    const ranInt = getRandomArbitrary(0, keys.length - 1);
-    //Return object
-    return this[keys[ranInt]];
-  },
-  question: {
-    questionText:
-      'What do the rules say about the requirement to keep a look-out?',
-    answer:
-      'Every vessel shall at all times maintain a proper look-out by sight and hearing as well as by all available means appropriate in the prevailing circumstances and conditions so as to make a full appraisal of the situation and of the risk of collision',
-  },
-};
-
-const basicNight2 = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 2,
-  },
-  Func2: {
-    Name: createResSit,
-    Par: true,
-  },
-  elevation: -90,
-};
-
-const intermediate = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 3,
-  },
-  Func2: {
-    Name: createOTSit,
-    Par: false,
-  },
-};
-
-const advanced = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 3,
-  },
-  Func2: {
-    Name: createXSit,
-    Par: true,
-  },
-  Func3: {
-    Name: createHOSit,
-    Par: null,
-  },
-  Func4: {
-    Name: createResSit,
-    Par: null,
-  },
-};
-
-const stageFour = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 3,
-  },
-  Func2: {
-    Name: createXSit,
-    Par: true,
-  },
-  Func3: {
-    Name: createHOSit,
-    Par: null,
-  },
-  Func4: {
-    Name: createResSit,
-    Par: null,
-  },
-  Func5: {
-    Name: createCompany,
-    Par: null,
-  },
-};
-
-const crossingGive = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 5,
-  },
-  Func2: {
-    Name: createXSit,
-    Par: true,
-  },
-};
-
-const crossingStand = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 5,
-  },
-  Func2: {
-    Name: createXSit,
-    Par: false,
-  },
-};
-const resVis1 = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 3,
-  },
-  Func2: {
-    Name: resVisAhead,
-  },
-};
-
-const resVis2 = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 2,
-  },
-  Func2: {
-    Name: resVisAbeamAbaft,
-    Par: true,
-  },
-};
-
-const resVis3 = {
-  Func1: {
-    Name: createNoPlay,
-    Par: 2,
-  },
-  Func2: {
-    Name: vesselAtAnchor,
-    Par: true,
-  },
-};
 
 // Draw elements
 function drawShip(ship) {
@@ -1161,11 +662,6 @@ function drawShip(ship) {
   }
   ship.vectorItem = new Group([
     new Path.Circle(ship.position, 6),
-    /*         new Path([
-            ship.vecEnd.add(ship.arrowVector.rotate(135)),
-            ship.vecEnd,
-            ship.vecEnd.add(ship.arrowVector.rotate(-135))
-        ]), */
     new Path.Circle({ center: ship.position, radius: 3, fillColor: 'white' }),
     new Path({
       segments: [[ship.position], [ship.vecEnd]],
@@ -1245,41 +741,6 @@ function drawShip(ship) {
       $('#width').text(myCanvas.width);
     });
   } else ship.vectorItem.strokeColor = 'white';
-
-  //Draw sector
-  //let urlScen = urlParams.get('scenario')
-  if (urlScen === 'stageFour') {
-    const centre = new Point(
-      myCanvas.getBoundingClientRect().width / 2,
-      myCanvas.getBoundingClientRect().height / 2
-    );
-    var from = new Point(centre.x - 20, centre.y + 20);
-    var through = new Point(centre.x + 20, centre.y + 20);
-    var to = new Point(centre.x + 20, centre.y - 20);
-    var inner = new Path.Arc(from, through, to);
-    inner.strokeColor = '#c8f8ff';
-    inner.strokeWidth = 2;
-    inner.strokeAlpha = 2;
-    inner.opacity = 0.5;
-    var from = new Point(centre.x - 50, centre.y + 50);
-    var through = new Point(centre.x + 50, centre.y + 50);
-    var to = new Point(centre.x + 50, centre.y - 50);
-    var outer = new Path.Arc(from, through, to);
-    outer.strokeColor = '#c8f8ff';
-    outer.strokeWidth = 2;
-    new Path.Line({
-      from: [centre.x - 20, centre.y + 20],
-      to: [centre.x - 50, centre.y + 50],
-      strokeColor: '#c8f8ff',
-      strokeWidth: 2,
-    });
-    new Path.Line({
-      from: [centre.x + 20, centre.y - 20],
-      to: [centre.x + 50, centre.y - 50],
-      strokeColor: '#c8f8ff',
-      strokeWidth: 2,
-    });
-  }
 }
 
 // Draw Range Rings
@@ -1329,564 +790,6 @@ function clearEditSelected() {
   }
 }
 
-// Controller for moving the scenario backward forward and resetting.
-
-var forward = false;
-
-$('#forward').click(function () {
-  for (var i = 0; i < shipsAfloat.length; i++) {
-    var ship = shipsAfloat[i];
-    if (ship.type != 'Own Ship') {
-      var moveVector = ship.relVec.divide(12);
-      ship.position = ship.position.add(moveVector);
-      ship.vecEnd = ship.vecEnd.add(moveVector);
-      calcCPA(ship, shipsAfloat[0]);
-      drawShip(ship, shipsAfloat[0]);
-    }
-  }
-});
-
-$('#backward').click(function () {
-  for (var i = 0; i < shipsAfloat.length; i++) {
-    var ship = shipsAfloat[i];
-    if (ship.type != 'Own Ship') {
-      var moveVector = ship.relVec.divide(12);
-      ship.position = ship.position.subtract(moveVector);
-      ship.vecEnd = ship.vecEnd.subtract(moveVector);
-      calcCPA(ship, shipsAfloat[0]);
-      drawShip(ship);
-    }
-  }
-});
-
-$('#reset').click(function () {
-  // Clear canvas
-  project.activeLayer.removeChildren();
-  shipsAfloat = _.cloneDeep(orgShipsAfloat);
-  // Reset Scale & Vec Length
-  scale = 12;
-  ShipVctrLngth = 6;
-  $('#range-scale, #range-scale-sec').text(scale);
-  $('#vec-length, #vec-length-sec').text(ShipVctrLngth);
-  drawRR();
-  // Draw ships afloat
-  for (var i = 0; i < shipsAfloat.length; i++) {
-    var ship = shipsAfloat[i];
-    calcCPA(ship, shipsAfloat[0]);
-    drawShip(ship);
-  }
-});
-
-///////////// Rule based scenarios ////////////////
-
-// Crossing situation
-// Own Ship Stand On or Give Way
-function createXSit(giveway) {
-  let rules = [];
-  var x = true;
-  while (x) {
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length from min max ranges
-    tempVec.length = randomIntFromInterval(MilesTopixels(5), MilesTopixels(15));
-    if (giveway == true) {
-      rules = ['15', '16'];
-      // Positon to Stb of ownShip
-      // Create angle between 5 degrees and 112 degrees from ownShips course
-      tempVec.angle = randomIntFromInterval(
-        shipsAfloat[0].vector.angle + 5,
-        shipsAfloat[0].vector.angle + 112
-      );
-      var testPos = shipsAfloat[0].position.subtract(tempVec);
-    } else {
-      rules = ['15', '17'];
-      // Create angle between 5 degrees and 112 degrees from ownShips course
-      tempVec.angle = randomIntFromInterval(
-        shipsAfloat[0].vector.angle - 5,
-        shipsAfloat[0].vector.angle - 112
-      );
-      // Positon to Port of ownShip
-      var testPos = shipsAfloat[0].position.subtract(tempVec);
-    }
-    var type = 'PDV';
-    // If statement to prevent generating an overtaking situation.
-    if (Math.abs(shipsAfloat[0].vector.angle - tempVec.angle) < 67.5) {
-      var min = shipsAfloat[0];
-    } else {
-      var min = 2;
-    }
-    let max = 28.0;
-    var speed = randomIntFromInterval(min, max);
-    var vecLength = calcvecLength(speed);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var course = randomIntFromInterval(0, 2 * Math.PI);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'test';
-    let tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      true
-    );
-    calcCPA(tempShip, shipsAfloat[0]);
-    x = criteriaCheck(tempShip, 0.6, 25);
-  }
-}
-
-// Head On Siuation
-function createHOSit() {
-  var x = true;
-  let rules = ['14'];
-  while (x) {
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length that is a min of 0.5 nm and max of 10 nm
-    tempVec.length = randomIntFromInterval(MilesTopixels(5), MilesTopixels(8));
-    // Create angle between -1 and 1 degree from ownShips course
-    tempVec.angle = randomIntFromInterval(
-      shipsAfloat[0].vector.angle - 1,
-      shipsAfloat[0].vector.angle - 1
-    );
-    let testPos = shipsAfloat[0].position.subtract(tempVec);
-    var type = 'PDV';
-    var speed = randomIntFromInterval(2.0, 28.0);
-    var vecLength = calcvecLength(speed);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var course = shipsAfloat[0].vector.angle * (Math.PI / 180);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'test';
-    const tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      true
-    );
-    calcCPA(tempShip, shipsAfloat[0]);
-    x = criteriaCheck(tempShip, 0.5, 59);
-  }
-}
-
-// Overtaking Siuation
-function createOTSit(overtaking) {
-  var x = true;
-  while (x) {
-    let rules = [];
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length that is a min of 1.5nm and max of 10 nm
-    tempVec.length = randomIntFromInterval(MilesTopixels(4), MilesTopixels(10));
-    if (overtaking == true) {
-      rules = ['13', '16'];
-      // Create angle between - 10 degrees and 10 degrees from ownShips course
-      tempVec.angle =
-        shipsAfloat[0].vector.angle + randomIntFromInterval(-10, 10);
-      var testPos = shipsAfloat[0].position.subtract(tempVec);
-      // Course is a function of angle from ownship to ensure the ownship is approaching from
-      // an angle greater than 22.5 degree abaft the beam.
-      var course =
-        (tempVec.angle + randomIntFromInterval(-67, 67)) * (Math.PI / 180) +
-        Math.PI;
-      // Speed less than ownShip
-      var speed = randomIntFromInterval(2.0, shipsAfloat[0].speed - 1);
-      var name = 'Being Overtaken';
-      // Vessel types in scenario
-      //tgtTypes = ["PDV","SV","VEIF","NUC","RAM"];
-      var probs = [70, 10, 10, 5, 5];
-      var type = randomSampleProb(tgtTypes, probs);
-    } else {
-      rules = ['13', '17'];
-      // Create angle between - 170 degrees and 170 degrees from ownShips course
-      tempVec.angle =
-        shipsAfloat[0].vector.angle + randomIntFromInterval(150, 210);
-      testPos = shipsAfloat[0].position.subtract(tempVec);
-      // Course is a function of angle from ownship to ensure the overtaking ship is approaching from
-      // an angle greater than 22.5 degree abaft the beam.
-      var course =
-        (shipsAfloat[0].vector.angle + randomIntFromInterval(-67, 67)) *
-          (Math.PI / 180) +
-        Math.PI;
-      // Speed greater than ownShip
-      var speed = randomIntFromInterval(shipsAfloat[0].speed + 1, 29.0);
-      var name = 'Overtaking';
-      // Vessel types in scenario
-      //tgtTypes = ["PDV","SV","VEIF","NUC","RAM"];
-      // For realism only be overtaken by SV and VEIF if going below 7kts
-      if (shipsAfloat[0].speed < 7) {
-        var probs = [10, 45, 45, 0, 0];
-        var type = randomSampleProb(tgtTypes, probs);
-        // realistic SV and VEIF speeds
-        if (['SV', 'VEIF'].includes(type)) {
-          var speed = randomIntFromInterval(shipsAfloat[0].speed + 1, 10);
-        }
-      } else {
-        var type = 'PDV';
-        var speed = randomIntFromInterval(shipsAfloat[0].speed + 1, 29.0);
-      }
-    }
-    var vecLength = calcvecLength(speed);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    const tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      true
-    );
-    calcCPA(tempShip, shipsAfloat[0]);
-    x = criteriaCheck(tempShip, 1, 59);
-  }
-}
-function createResSit() {
-  var x = true;
-  let rules = ['18', '18a', '16'];
-  while (x) {
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length that is a min of 0.5 nm and max of 15 nm
-    tempVec.length = randomIntFromInterval(MilesTopixels(2), MilesTopixels(5));
-    // Create angle from ownShips course
-    tempVec.angle = randomIntFromInterval(0, 360);
-    testPos = shipsAfloat[0].position.subtract(tempVec);
-    // Vessel types in scenario
-    //tgtTypes = ["PDV","SV","VEIF","NUC","RAM"];
-    var probs = [0, 25, 25, 25, 25];
-    var type = randomSampleProb(tgtTypes, probs);
-    var speed = randomIntFromInterval(1, 8);
-    var vecLength = calcvecLength(speed);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var course = randomIntFromInterval(0, 2 * Math.PI);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'Responsibility';
-    var tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      true
-    );
-    calcCPA(tempShip, shipsAfloat[0]);
-    x = criteriaCheck(tempShip, 0.8, 25);
-  }
-}
-
-function createCompany() {
-  const rules = [{ Note: 'Special Maneuvering Rules apply' }];
-  var type = 'PDV';
-  var speed = shipsAfloat[0].speed;
-  var vecLength = calcvecLength(speed);
-  var posX = shipsAfloat[0].position.x + 50;
-  var posY = shipsAfloat[0].position.y;
-  var course = shipsAfloat[0].course;
-  var endX = Math.cos(course) * vecLength + posX;
-  var endY = Math.sin(course) * vecLength + posY;
-  var name = 'CNX';
-  var tempShip = new Ship(
-    posX,
-    posY,
-    endX,
-    endY,
-    name,
-    type,
-    course,
-    rules,
-    speed,
-    false
-  );
-  calcCPA(tempShip, shipsAfloat[0]);
-  shipsAfloat.push(tempShip);
-}
-
-function createNoPlay(numberTgts) {
-  let rules = [];
-  //  other tgts to meet numberTgts
-  var count = 0;
-  while (count < numberTgts) {
-    // Vessel types in scenario
-    //tgtTypes = ["PDV","SV","VEIF","NUC","RAM"];
-    var probs = [40, 20, 20, 10, 10];
-    var type = randomSampleProb(tgtTypes, probs);
-    // realistic SV and VEIF speeds
-    if (['SV', 'VEIF'].includes(type)) {
-      var speed = randomIntFromInterval(3, 9);
-    }
-    if (['NUC', 'RAM'].includes(type)) {
-      var speed = randomIntFromInterval(2, 7);
-    }
-    if (type == 'PDV') {
-      var speed = randomIntFromInterval(1, 27);
-    }
-    var vecLength = calcvecLength(speed);
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length that is a min of 2 nm and max of 15 nm
-    tempVec.length = randomIntFromInterval(MilesTopixels(2), MilesTopixels(15));
-    // Create angle from ownShips course
-    tempVec.angle = randomIntFromInterval(0, 360);
-    var testPos = shipsAfloat[0].position.subtract(tempVec);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var course = randomIntFromInterval(0, 2 * Math.PI);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'N/A';
-    var tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      false
-    );
-    // Does the contact not meet the risk of collision criteria
-    // If yes check that they are atleast 0.5 miles from other ships afloat.
-    calcCPA(tempShip, shipsAfloat[0]);
-
-    // Check CPA is greater than 2 NM
-    if (
-      pixelsToMiles(tempShip.cpa) > 2 &&
-      pixelsToMiles(Math.round(tempVec.length)) > 0.8
-    ) {
-      if (shipsAfloat.length > 2) {
-        var ranges = [];
-        for (var i = 1; i < shipsAfloat.length; i++) {
-          var ship = shipsAfloat[i];
-          const vecToTempShip = tempShip.position.subtract(ship.position);
-          var rangeToTempShip = pixelsToMiles(Math.round(vecToTempShip.length));
-          ranges.push(rangeToTempShip);
-        }
-        // Range from other ships greater than 0.5nm
-        if (Math.min.apply(Math, ranges) > 0.5) {
-          // Add to shipsAfloat and add to Count
-          shipsAfloat.push(tempShip);
-          count++;
-        }
-      }
-      // There are no tgts, add first one.
-      else {
-        shipsAfloat.push(tempShip);
-        count++;
-      }
-    }
-  }
-}
-
-// ResVis
-// Vessel ahead of beam
-function resVisAhead() {
-  var x = true;
-  while (x) {
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length that is a min of 1nm and max of 10 nm
-    tempVec.length = randomIntFromInterval(MilesTopixels(3), MilesTopixels(7));
-    let rules = ['19'];
-    // Positon ahead of beam ownShip
-    // Create angle between -89 degrees and 89 degrees from ownShips course
-    tempVec.angle = randomIntFromInterval(
-      shipsAfloat[0].vector.angle - 89,
-      shipsAfloat[0].vector.angle + 89
-    );
-    const testPos = shipsAfloat[0].position.subtract(tempVec);
-    var type = 'PDV'; // For Model
-    var typeSound = 'PDV - making way';
-    // If statement to prevent generating an overtaking situation.
-    if (Math.abs(shipsAfloat[0].vector.angle - tempVec.angle) < 67.5) {
-      var min = shipsAfloat[0];
-    } else {
-      var min = 2;
-    }
-    const max = 28.0;
-    var speed = randomIntFromInterval(min, max);
-    var vecLength = calcvecLength(speed);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var course = randomIntFromInterval(0, 2 * Math.PI);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'test';
-    const tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      true,
-      typeSound
-    );
-    calcCPA(tempShip, shipsAfloat[0]);
-    x = criteriaCheck(tempShip, 0.6, 25);
-  }
-}
-
-// Vessel abeam or abaft beam
-function resVisAbeamAbaft() {
-  var x = true;
-  while (x) {
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length that is a min of 1nm and max of 10 nm
-    tempVec.length = randomIntFromInterval(
-      MilesTopixels(1.5),
-      MilesTopixels(15)
-    );
-    const rules = ['19'];
-    // Positon ahead of beam ownShip
-    // Create angle between - degrees and 89 degrees from ownShips course
-    tempVec.angle = randomIntFromInterval(
-      shipsAfloat[0].vector.angle + 90,
-      shipsAfloat[0].vector.angle + 270
-    );
-    let testPos = shipsAfloat[0].position.subtract(tempVec);
-    var type = 'PDV'; // For model
-    var typeSound = 'PDV - making way';
-    const max = 28.0;
-    const min = 4;
-    var speed = randomIntFromInterval(min, max);
-    var vecLength = calcvecLength(speed);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var course = randomIntFromInterval(0, 2 * Math.PI);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'test';
-    const tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      true,
-      typeSound
-    );
-    calcCPA(tempShip, shipsAfloat[0]);
-    x = criteriaCheck(tempShip, 0.6, 25);
-  }
-}
-
-// Vessel at anchor
-function vesselAtAnchor() {
-  var x = true;
-  while (x) {
-    var tempVec = new Point(0, 0); // Generate Vector
-    // Create a length that is a min of 1nm and max of 10 nm
-    tempVec.length = randomIntFromInterval(MilesTopixels(1), MilesTopixels(2));
-    // Positon ahead of beam ownShip
-    // Create angle between - degrees and 89 degrees from ownShips course
-    tempVec.angle = randomIntFromInterval(
-      shipsAfloat[0].vector.angle + 90,
-      shipsAfloat[0].vector.angle + 270
-    );
-    testPos = shipsAfloat[0].position.subtract(tempVec);
-    var type = 'PDV';
-    var typeSound = 'anchorless100m';
-    var speed = 0;
-    var vecLength = calcvecLength(speed);
-    var posX = testPos.x;
-    var posY = testPos.y;
-    var course = randomIntFromInterval(0, 2 * Math.PI);
-    var endX = Math.cos(course) * vecLength + posX;
-    var endY = Math.sin(course) * vecLength + posY;
-    var name = 'test';
-    const tempShip = new Ship(
-      posX,
-      posY,
-      endX,
-      endY,
-      name,
-      type,
-      course,
-      rules,
-      speed,
-      typeSound
-    );
-    calcCPA(tempShip, shipsAfloat[0]);
-    x = criteriaCheck(tempShip, 2, 30);
-  }
-}
-
-// Function for checking that a newShip meets the risk of collision criteria
-// and that they are aren't on top of another vessel
-function criteriaCheck(newShip, cpaThres, tcpaThres) {
-  const vecOwnShip = newShip.position.subtract(shipsAfloat[0].position);
-  var range = pixelsToMiles(Math.round(vecOwnShip.length));
-  if (
-    pixelsToMiles(newShip.cpa) < cpaThres &&
-    newShip.tcpa > 0 &&
-    newShip.tcpa < tcpaThres &&
-    range > 2
-  ) {
-    // If there is one Tgt check ranges
-    if (shipsAfloat.length > 2) {
-      var ranges = [];
-      for (var i = 1; i < shipsAfloat.length; i++) {
-        var ship = shipsAfloat[i];
-        // Get distance to ship
-        const vecToNewShip = newShip.position.subtract(ship.position);
-        var rangeToNewShip = pixelsToMiles(Math.round(vecToNewShip.length));
-        ranges.push(rangeToNewShip);
-      }
-      // Check that the newShip is no closer than 0.5nm to any other ship.
-      if (Math.min.apply(Math, ranges) > 0.5) {
-        // Add to shipsAfloat
-        shipsAfloat.push(newShip);
-        return false;
-      }
-    }
-    // There are no tgts, add first one.
-    else {
-      shipsAfloat.push(newShip);
-      return false;
-    }
-  } else {
-    return true;
-  }
-}
-
-//Random sample with probabilities
-function randomSampleProb(types, weights) {
-  // [0..1) * sum of weight
-  var sample = Math.random() * weights.reduce((sum, weight) => sum + weight, 0);
-  // first sample n where sum of weight for [0..n] > sample
-  var index = weights.findIndex((weight) => (sample -= weight) < 0);
-
-  return types[index];
-}
 // Animate Ships and update relative positions for 3D render
 
 // Once document is loaded show
@@ -1992,25 +895,6 @@ $(document).ready(function () {
   });
 });
 
-///////////// Things that happen after clicking Next ////////////////
-
-const completeReport = function () {
-  // The is where the final data gets sent to the API
-  console.log(
-    `intentions: ${intentionsArr} | contactReports: ${contactReports} | finalShipsAfloat: ${shipsAfloat}`
-  );
-  // reqData('PATCH', `${APIURL}api/scenarios/${scenarioId}`, {
-  //   intentions: intentionsArr,
-  //   contactReports: contactReports,
-  //   finalShipsAfloat: shipsAfloat,
-  //   end: Date.now(),
-  // })
-  //   .then((res) => {})
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
-};
-
 // Find reciprocal bearing
 function recip(bearing) {
   if (bearing > 180) return bearing - 180;
@@ -2041,23 +925,4 @@ function updateUSNRFrmOwnshp(ship, ownship) {
   );
 }
 
-export {
-  calcvecLength,
-  calcCPA,
-  completeReport,
-  question,
-  urlScen,
-  drawShip,
-  updateShips,
-};
-
-// Dynamic import of 3d rendering module
-// function initThreeDRenderingModule() {
-//   return import('./3dmodv2.js')
-//     .then(() => {
-//       buildThreeDRendering();
-//     })
-//     .catch(
-//       (error) => 'An error occurred while loading the three d rendering module'
-//     );
-// }
+export { calcvecLength, calcCPA, drawShip, updateShips, convertAngle };

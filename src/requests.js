@@ -21,6 +21,5 @@ const getData = async function (url) {
   });
   return response.json();
 };
-const APIURL =
-  'http://node-express-env.eba-xu2ptdt2.ap-southeast-2.elasticbeanstalk.com/';
+const APIURL = 'placeholder-api-url-here';
 export { reqData, getData, APIURL };

@@ -7,7 +7,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import { updateShips } from './app.js';
+import { updateShips, convertAngle } from './app.js';
 
 // Declare variables
 let camera, scene, renderer;
@@ -277,7 +277,7 @@ function buildThreeDRendering() {
 
     $('#course-display').append(
       `<p>${addoos(
-        window.convertAngle(window.shipsAfloat[0].vector.angle).toFixed(1)
+        convertAngle(window.shipsAfloat[0].vector.angle).toFixed(1)
       )}&deg;</p>`
     );
     $('#speed-display').append(
@@ -484,24 +484,6 @@ function convertPos(pos) {
   return b;
 }
 
-// Create clock
-// Generate night hour
-function makeNightTime() {
-  const myArray = [0, 1, 2, 3, 4, 20, 21, 22, 23];
-  let randomValue = myArray[Math.floor(Math.random() * myArray.length)];
-  return randomValue;
-}
-
-let h = makeNightTime();
-h = checkTime(h);
-
-function checkTime(i) {
-  if (i < 10) {
-    i = '0' + i;
-  } // add zero in front of numbers < 10
-  return i;
-}
-
 function render() {
   const time = performance.now() * 0.001;
   if (water.material.uniforms) {
@@ -691,7 +673,8 @@ $(function () {
     playAudio(); //
   });
 });
-///// Bearing Logger ////
+
+// Bearing Logger
 let currentTime = '';
 const bearingLogger = function (clickedCompass) {
   // Only log when using compass
