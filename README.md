@@ -9,8 +9,8 @@ The scenario simulator displays shipping situations that are generated to hightl
 <p>To use the web app:</p>
 <ol>
   <li>Load the app in a web browser, and an initial scenario will be displayed on the canvas.</li>
-  <li>Use the provided controls to interact with the simulation, such as generating a new scenario, entering edit mode, adjusting the range scale, or changing vector lengths.</li>
-  <li>Select ships to view their properties and information in the accordion info panels.</li>
+  <li>Use the provided controls to interact with the simulation, such as panning left and right on the 'lookout' view, taking compass bearings, adjusting the radar range scale, or changing radar vector lengths.</li>
+  <li>Select ships on the radar to view their properties and information in the accordion info panels.</li>
   <li>Resize the browser window as needed, and the canvas will adjust accordingly to maintain the positions of ships relative to the own ship.</li>
 </ol>
 <h3>Modules and Dependencies</h3>
@@ -33,23 +33,12 @@ The scenario simulator displays shipping situations that are generated to hightl
   <li><code>centX</code> and <code>centY</code>: The center X and Y coordinates of the canvas.</li>
   <li><code>onemile</code>: A scaling factor for converting canvas units to nautical miles.</li>
 </ul>
-<h3>User Interface and Interactions</h3>
-<p>The web app provides various user interface elements for interacting with the ships and adjusting the display:</p>
-<ul>
-  <li><strong>New Scenario</strong>: Generates a new scenario with ships.</li>
-  <li><strong>Edit Mode</strong>: Toggles the edit mode on and off, allowing users to modify ship positions and vector lengths.</li>
-  <li><strong>Range Adjustment</strong>: Users can increase or decrease the display range scale.</li>
-  <li><strong>Vector Length Adjustment</strong>: Users can increase or decrease the ship vector lengths.</li>
-  <li><strong>Accordion Info Panels</strong>: Displays detailed information about the selected ship.</li>
-  <li><strong>Mouse Events</strong>: Users can interact with ships using mouse events like dragging and clicking.</li>
-</ul>
 <h3>Functions</h3>
 <p>The web app exports several functions for use in other modules:</p>
 <ul>
   <li><code>calcvecLength()</code>: Calculates the length of a ship's vector.</li>
   <li><code>calcCPA()</code>: Calculates the closest point of approach (CPA) between two ships.</li>
   <li><code>completeReport()</code>: Generates a report for the selected ship.</li>
-  <li><code>question()</code>: Asks a question about the scenario and updates the report based on the answer.</li>
   <li><code>urlScen()</code>: Generates a URL for sharing the current scenario.</li>
   <li><code>drawShip()</code>: Draws a ship on the canvas.</li>
   <li><code>updateShips()</code>:
