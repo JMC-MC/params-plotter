@@ -24,7 +24,14 @@ $(function () {
     $('#rules-view').hide();
     $('#report-view').hide();
     $('#staff-answer').hide();
+
+    setTimeout(() => {
+      console.log('attempting to fire resize')
+      $(window).trigger('resize');
+    },300)
+
   });
+
   $('#rules-button').on('touchstart mousedown', function () {
     // Switch Screens
     $('#radar').hide();
