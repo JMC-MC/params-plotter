@@ -38,7 +38,7 @@ Maybe because people uses mobile more than laptops..
 
 How does it reflect in our way of creating app?
 
-In css, we write for mobile, and the use media query to adhere to larger screen.
+In css, we write for mobile, and then use media query to adhere to larger screen.
 
 I personally think it's better: we start with minimal things, and add to it.
 
