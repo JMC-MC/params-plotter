@@ -7,6 +7,7 @@ import './report.js';
 import { updateTgtList } from './report.js';
 import './navigation.js';
 
+
 // Make the paper scope global, by injecting it into window:
 import('paper').then(({ default: paper }) => {
   paper.install(window);
