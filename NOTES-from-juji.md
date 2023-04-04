@@ -32,7 +32,7 @@ The way we create apps, should be Mobile First.
 
 [https://medium.com/@Vincentxia77/what-is-mobile-first-design-why-its-important-how-to-make-it-7d3cf2e29d00](https://medium.com/@Vincentxia77/what-is-mobile-first-design-why-its-important-how-to-make-it-7d3cf2e29d00)
 
-That's just the way people does it, nowadays..
+That's just the way people do it, nowadays..
 
 Maybe because people uses mobile more than laptops..
 
