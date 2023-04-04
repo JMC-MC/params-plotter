@@ -34,7 +34,7 @@ The way we create apps, should be Mobile First.
 
 That's just the way people do it, nowadays..
 
-Maybe because people uses mobile more than laptops..
+Maybe because people use mobiles more than laptops..
 
 How does it reflect in our way of creating app?
 
