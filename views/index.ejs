@@ -50,6 +50,7 @@
       href="https://kit.fontawesome.com/60d94bcdaf.css"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="/styles/main-addition.css" />
   </head>
   <body>
     <div class="overlay">
@@ -319,16 +320,15 @@
     </div>
     <div id="rules-view">
       <div class="header">
-        Search:
-        <input type="search" placeholder="Example: look-out" />
+        <input type="search" placeholder="Search | Example: look-out" />
         <button data-search="next">
           <span class="fa-regular fa-angle-down"></span>
         </button>
         <button data-search="prev">
           <span class="fa-regular fa-angle-up"></span>
         </button>
-        <button data-search="clear">
-          <span class="fa-regular fa-x"></span>
+        <button class="remove-search" data-search="clear">
+          <span>&times;</span>
         </button>
       </div>
       <div class="rules-text">
@@ -2395,6 +2395,7 @@
         <li id="reprtBttnCntr" ><a id="report-button" class="nav-item"><i class="fa-light fa-phone"></i><p>report</p></a></li>
       </ul>
     </div>
+    <script type="text/javascript" src="/js/navigation.js"></script>
   </body>
   <footer></footer>
 </html>
