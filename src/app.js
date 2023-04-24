@@ -7,7 +7,6 @@ import './report.js';
 import { updateTgtList } from './report.js';
 import './navigation.js';
 
-
 // Make the paper scope global, by injecting it into window:
 import('paper').then(({ default: paper }) => {
   paper.install(window);
@@ -356,23 +355,21 @@ const checkData = function () {
 
 // Import and process generated Scenario into one that will display on radar
 const importScenario = function (data) {
-  elevation = data.elevation;
+  elevation = 1; // TODO: Get elevation from data
   resVis = data.resVis;
   // Find vector from gen centre to screen center
   const screenCenter = new Point(centX, centY);
   // Intialise paperjs point
-  data.center = new Point(data.center[1], data.center[2]);
+  data.center = new Point(data.center[0], data.center[1]);
   const delta = screenCenter.subtract(data.center);
   // Reposition all ships based on screen centre
   data.genShipsAfloat.map((ship) => {
-    // Convert all arrays with first value 'point' to paperjs Points
     // Intialise paperjs point
-    ship.position = new Point(ship.position[1], ship.position[2]);
+    ship.position = new Point(ship.position.x, ship.position.y);
     ship.position = ship.position.add(delta);
     // Scale positions
     if (ship.type != 'Own Ship') {
-      // Intialise paperjs for  point
-      ship.vecOwnShip = new Point(ship.vecOwnShip[1], ship.vecOwnShip[2]);
+      ship.vecOwnShip = ship.position.subtract(data.genShipsAfloat[0].position);
       ship.vecOwnShip = ship.vecOwnShip.multiply(onemile);
       ship.position = screenCenter.add(ship.vecOwnShip);
     }
@@ -381,6 +378,10 @@ const importScenario = function (data) {
     const endX = Math.cos(ship.course) * vecLength + ship.position.x;
     const endY = Math.sin(ship.course) * vecLength + ship.position.y;
     ship.vecEnd = new Point(endX, endY);
+    // Select tgt 001
+    if (ship.name == '001') {
+      ship.targetSelected = true;
+    }
   });
   console.log(data);
   shipsAfloat = data.genShipsAfloat;
