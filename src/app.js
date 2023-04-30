@@ -6,6 +6,8 @@ import { mark, unmark } from 'markjs';
 import './report.js';
 import { updateTgtList } from './report.js';
 import './navigation.js';
+import * as TSSHandler from './tss-handler.js';
+import { radToDeg } from 'three/src/math/MathUtils.js';
 
 // Make the paper scope global, by injecting it into window:
 import('paper').then(({ default: paper }) => {
@@ -236,9 +238,8 @@ let orgShipsAfloat = [];
 window.shipsAfloat = [];
 // Start time
 let scenarioStart = '';
-
-// Functions for display settings
-
+// TSS
+let TSS = '';
 // Display scale
 
 function upDateScale(direction) {
@@ -246,7 +247,9 @@ function upDateScale(direction) {
   // If reducing range scale
   if (direction == 'minus') {
     onemile += onemile;
+    TSSHandler.updateScale(TSS, shipsAfloat, direction);
     drawRR();
+    drawTSS(TSS);
     // Loop through every ship
     for (var i = 0; i < shipsAfloat.length; i++) {
       var ship = shipsAfloat[i];
@@ -266,7 +269,9 @@ function upDateScale(direction) {
     }
   } else {
     onemile = onemile / 2;
+    TSSHandler.updateScale(TSS, shipsAfloat, direction);
     drawRR();
+    drawTSS(TSS);
     // Loop through every ship
     for (var i = 0; i < shipsAfloat.length; i++) {
       var ship = shipsAfloat[i];
@@ -314,10 +319,22 @@ function updateVecLen(direction) {
 }
 
 // Functions for Ships
-// Move shipsAfloat
+// Move shipsAfloat and features
 const updateShips = function (delta) {
   const deltaSecs = delta / 1000;
   if (play == true) {
+    drawRR();
+    // Update TSS
+    if (TSS.trafficLanes.occupiedPosition) {
+      const OSvecInSec = shipsAfloat[0].vector.length * 60;
+      const factor = deltaSecs / OSvecInSec;
+      const moveVector = shipsAfloat[0].vector.multiply(factor);
+      moveVector.angle -= 180;
+      const newPosition = TSS.trafficLanes.occupiedPosition.add(moveVector);
+      TSSHandler.updatePosition(newPosition, TSS);
+      drawTSS(TSS);
+    }
+    drawShip(shipsAfloat[0]);
     for (var i = 0; i < shipsAfloat.length; i++) {
       var ship = shipsAfloat[i];
       if (ship.type != 'Own Ship') {
@@ -383,7 +400,41 @@ const importScenario = function (data) {
       ship.targetSelected = true;
     }
   });
-  console.log(data);
+  // TSS
+  if (data.TSS) {
+    // Initialise paperjs points
+    data.TSS.trafficLanes.occupiedPosition = new Point(
+      data.TSS.trafficLanes.occupiedPosition.x,
+      data.TSS.trafficLanes.occupiedPosition.y
+    );
+    data.TSS.trafficLanes.otherPosition = new Point(
+      data.TSS.trafficLanes.otherPosition.x,
+      data.TSS.trafficLanes.otherPosition.y
+    );
+    data.TSS.sepZone.position = new Point(
+      data.TSS.sepZone.position.x,
+      data.TSS.sepZone.position.y
+    );
+    // Convert Orientation
+    data.TSS.orientation = radToDeg(data.TSS.orientation); //TODO: Check polarity is correct.
+
+    // Scale dimensions
+    data.TSS.trafficLanes.width = data.TSS.trafficLanes.width * onemile;
+    data.TSS.sepZone.width = data.TSS.sepZone.width * onemile;
+    data.TSS.length = data.TSS.length * onemile;
+
+    // Reposition based on new centre
+    const newPosition = data.TSS.trafficLanes.occupiedPosition.add(delta);
+    TSSHandler.updatePosition(newPosition, data.TSS);
+
+    // Scale positions
+    if (!data.TSS.trafficLanes.occupiedPosition.equals(screenCenter)) {
+      console.log('Scale position');
+    }
+    // Add to TSS variable;
+    TSS = data.TSS;
+    drawTSS(TSS);
+  }
   shipsAfloat = data.genShipsAfloat;
   shipsAfloat.forEach((ship) => {
     drawShip(ship);
@@ -768,6 +819,57 @@ function drawRR() {
   ]);
   rangeRings.strokeWidth = 1;
   rangeRings.strokeColor = '#282828';
+}
+
+// Draw Range Rings
+function drawTSS(TSS) {
+  if (TSS.paths) TSS.paths.remove();
+
+  const occupiedTrafficLane = new Rectangle(
+    new Point(0, 0),
+    new Size(TSS.length, TSS.trafficLanes.width)
+  );
+  occupiedTrafficLane.center = new Point(TSS.trafficLanes.occupiedPosition);
+
+  const otherTrafficLane = new Rectangle(
+    new Point(0, 0),
+    new Size(TSS.length, TSS.trafficLanes.width)
+  );
+  otherTrafficLane.center = new Point(TSS.trafficLanes.otherPosition);
+
+  const sepZone = new Rectangle(
+    new Point(0, 0),
+    new Size(TSS.length, TSS.sepZone.width)
+  );
+  sepZone.center = new Point(TSS.sepZone.position);
+
+  // Create a path for the outer boundaries of the traffic lanes
+  const occLaneOuterBoundary = new Path.Line(
+    occupiedTrafficLane.bottomLeft,
+    occupiedTrafficLane.bottomRight
+  );
+  const otherLaneOuterBoundary = new Path.Line(
+    otherTrafficLane.topLeft,
+    otherTrafficLane.topRight
+  );
+
+  const sepZonePath = new Path.Rectangle(sepZone);
+
+  const trafficLanes = new Group([
+    occLaneOuterBoundary,
+    otherLaneOuterBoundary,
+  ]);
+
+  TSS.paths = new Group([trafficLanes, sepZonePath]);
+
+  TSS.paths.rotate(TSS.orientation, new Point(centX, centY));
+
+  trafficLanes.strokeWidth = 1;
+  trafficLanes.dashArray = [10, 5]; // Set the dash pattern: 10 units long dash followed by 5 units gap
+  trafficLanes.strokeColor = '#bf1a80';
+
+  sepZonePath.fillColor = '#bf1a80';
+  sepZonePath.opacity = 0.75;
 }
 
 //Clear selected in all ships

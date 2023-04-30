@@ -4,7 +4,7 @@ class View {
   static async generateScenario() {
     const scenario_context = 'OW';
     const scenario_environment = 'day';
-    const traffic_level = 0;
+    const traffic_level = 1;
     try {
       // Send a GET request to the external API with the query parameters
       const response = await axios.get(
