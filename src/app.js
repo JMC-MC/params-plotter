@@ -7,6 +7,7 @@ import './report.js';
 import { updateTgtList } from './report.js';
 import './navigation.js';
 import * as TSSHandler from './tss-handler.js';
+import * as NCHandler from './nc-handler.js';
 import { radToDeg } from 'three/src/math/MathUtils.js';
 
 // Make the paper scope global, by injecting it into window:
@@ -110,6 +111,20 @@ import('paper').then(({ default: paper }) => {
       centX = myCanvas.getBoundingClientRect().width / 2;
       centY = myCanvas.getBoundingClientRect().height / 2;
       drawRR();
+      if (TSS) {
+        TSSHandler.updatePositionOccupied(
+          TSS.trafficLanes.occupied.position.add(event.delta.divide(2)),
+          TSS
+        );
+        drawTSS(TSS);
+      }
+      if (NC) {
+        NCHandler.updatePositionOccupied(
+          NC.lanes.occupied.position.add(event.delta.divide(2)),
+          NC
+        );
+        drawNC(NC);
+      }
       for (var i = 0; i < shipsAfloat.length; i++) {
         var ship = shipsAfloat[i];
         ship.position = ship.position.add(event.delta.divide(2));
@@ -240,16 +255,26 @@ window.shipsAfloat = [];
 let scenarioStart = '';
 // TSS
 let TSS = '';
-// Display scale
+// NC
+let NC = '';
 
+// Display scale
 function upDateScale(direction) {
   //Move ships on screen to reflect new scale
   // If reducing range scale
   if (direction == 'minus') {
     onemile += onemile;
-    TSSHandler.updateScale(TSS, shipsAfloat, direction);
+
     drawRR();
-    drawTSS(TSS);
+    if (TSS) {
+      TSSHandler.updateScale(TSS, shipsAfloat, direction);
+      drawTSS(TSS);
+    }
+    if (NC) {
+      NCHandler.updateScale(NC, shipsAfloat, direction);
+      drawNC(NC);
+    }
+
     // Loop through every ship
     for (var i = 0; i < shipsAfloat.length; i++) {
       var ship = shipsAfloat[i];
@@ -269,9 +294,15 @@ function upDateScale(direction) {
     }
   } else {
     onemile = onemile / 2;
-    TSSHandler.updateScale(TSS, shipsAfloat, direction);
     drawRR();
-    drawTSS(TSS);
+    if (TSS) {
+      TSSHandler.updateScale(TSS, shipsAfloat, direction);
+      drawTSS(TSS);
+    }
+    if (NC) {
+      NCHandler.updateScale(NC, shipsAfloat, direction);
+      drawNC(NC);
+    }
     // Loop through every ship
     for (var i = 0; i < shipsAfloat.length; i++) {
       var ship = shipsAfloat[i];
@@ -325,14 +356,24 @@ const updateShips = function (delta) {
   if (play == true) {
     drawRR();
     // Update TSS
-    if (TSS.trafficLanes.occupiedPosition) {
+    if (TSS) {
       const OSvecInSec = shipsAfloat[0].vector.length * 60;
       const factor = deltaSecs / OSvecInSec;
-      const moveVector = shipsAfloat[0].vector.multiply(factor);
-      moveVector.angle -= 180;
-      const newPosition = TSS.trafficLanes.occupiedPosition.add(moveVector);
-      TSSHandler.updatePosition(newPosition, TSS);
+      let moveVector = shipsAfloat[0].vector.multiply(factor);
+      moveVector.angle = shipsAfloat[0].vector.angle - 180;
+      const newPosition = TSS.trafficLanes.occupied.position.add(moveVector);
+      TSSHandler.updatePositionOccupied(newPosition, TSS);
       drawTSS(TSS);
+    }
+    // Update Narrow Channel
+    if (NC) {
+      const OSvecInSec = shipsAfloat[0].vector.length * 60;
+      const factor = deltaSecs / OSvecInSec;
+      let moveVector = shipsAfloat[0].vector.multiply(factor);
+      moveVector.angle = shipsAfloat[0].vector.angle - 180;
+      const newPosition = NC.lanes.occupied.position.add(moveVector);
+      NCHandler.updatePositionOccupied(newPosition, NC);
+      drawNC(NC);
     }
     drawShip(shipsAfloat[0]);
     for (var i = 0; i < shipsAfloat.length; i++) {
@@ -370,7 +411,7 @@ const checkData = function () {
   }
 };
 
-// Import and process generated Scenario into one that will display on radar
+// Import and process generated Scenario
 const importScenario = function (data) {
   elevation = 1; // TODO: Get elevation from data
   resVis = data.resVis;
@@ -403,37 +444,108 @@ const importScenario = function (data) {
   // TSS
   if (data.TSS) {
     // Initialise paperjs points
-    data.TSS.trafficLanes.occupiedPosition = new Point(
-      data.TSS.trafficLanes.occupiedPosition.x,
-      data.TSS.trafficLanes.occupiedPosition.y
+
+    //Centre Positions
+    data.TSS.trafficLanes.occupied.position = new Point(
+      data.TSS.trafficLanes.occupied.position.x,
+      data.TSS.trafficLanes.occupied.position.y
     );
-    data.TSS.trafficLanes.otherPosition = new Point(
-      data.TSS.trafficLanes.otherPosition.x,
-      data.TSS.trafficLanes.otherPosition.y
+    data.TSS.trafficLanes.other.position = new Point(
+      data.TSS.trafficLanes.other.position.x,
+      data.TSS.trafficLanes.other.position.y
     );
     data.TSS.sepZone.position = new Point(
       data.TSS.sepZone.position.x,
       data.TSS.sepZone.position.y
     );
+    data.TSS.sepZone.position = new Point(
+      data.TSS.sepZone.position.x,
+      data.TSS.sepZone.position.y
+    );
+    // Corners
+    data.TSS.trafficLanes.occupied.corners.forEach((corner) => {
+      corner = new Point(corner.x, corner.y);
+    });
+    data.TSS.trafficLanes.other.corners.forEach((corner) => {
+      corner = new Point(corner.x, corner.y);
+    });
+    data.TSS.sepZone.corners.forEach((corner) => {
+      corner = new Point(corner.x, corner.y);
+    });
     // Convert Orientation
-    data.TSS.orientation = radToDeg(data.TSS.orientation); //TODO: Check polarity is correct.
+    data.TSS.orientation = radToDeg(data.TSS.orientation);
 
     // Scale dimensions
     data.TSS.trafficLanes.width = data.TSS.trafficLanes.width * onemile;
     data.TSS.sepZone.width = data.TSS.sepZone.width * onemile;
     data.TSS.length = data.TSS.length * onemile;
 
-    // Reposition based on new centre
-    const newPosition = data.TSS.trafficLanes.occupiedPosition.add(delta);
-    TSSHandler.updatePosition(newPosition, data.TSS);
-
     // Scale positions
-    if (!data.TSS.trafficLanes.occupiedPosition.equals(screenCenter)) {
-      console.log('Scale position');
-    }
+    if (!data.TSS.trafficLanes.occupied.position.equals(data.center)) {
+      const vecToCentre = data.TSS.trafficLanes.occupied.position.subtract(
+        data.center
+      );
+      const scalesVecToCentre = vecToCentre.multiply(onemile);
+      const newPosition = screenCenter.add(scalesVecToCentre);
+      // Update positions
+      TSSHandler.updatePositionOccupied(newPosition, data.TSS);
+    } else TSSHandler.updatePositionOccupied(screenCenter, data.TSS);
+
     // Add to TSS variable;
     TSS = data.TSS;
     drawTSS(TSS);
+  }
+  if (data.NC) {
+    // Initialise paperjs points
+    data.NC.lanes.occupied.position = new Point(
+      data.NC.lanes.occupied.position.x,
+      data.NC.lanes.occupied.position.y
+    );
+    data.NC.lanes.other.position = new Point(
+      data.NC.lanes.other.position.x,
+      data.NC.lanes.other.position.y
+    );
+    data.NC.sepZone.position = new Point(
+      data.NC.sepZone.position.x,
+      data.NC.sepZone.position.y
+    );
+    data.NC.markers.portMarkers.forEach((marker) => {
+      marker = new Point(marker.x, marker.y);
+    });
+    data.NC.markers.starboardMarkers.forEach((marker) => {
+      marker = new Point(marker.x, marker.y);
+    });
+    // Corners
+    data.NC.lanes.occupied.corners.forEach((corner) => {
+      corner = new Point(corner.x, corner.y);
+    });
+    data.NC.lanes.other.corners.forEach((corner) => {
+      corner = new Point(corner.x, corner.y);
+    });
+    data.NC.sepZone.corners.forEach((corner) => {
+      corner = new Point(corner.x, corner.y);
+    });
+    // Convert Orientation
+    data.NC.orientation = radToDeg(data.NC.orientation);
+
+    // Scale dimensions
+    data.NC.lanes.width = data.NC.lanes.width * onemile;
+    data.NC.sepZone.width = data.NC.sepZone.width * onemile;
+    data.NC.length = data.NC.length * onemile;
+
+    // Scale positions of occupied lane
+    if (!data.NC.lanes.occupied.position.equals(data.center)) {
+      const vecToCentre = data.NC.lanes.occupied.position.subtract(data.center);
+      const scalesVecToCentre = vecToCentre.multiply(onemile);
+      const newPosition = screenCenter.add(scalesVecToCentre);
+      // Update positions
+      NCHandler.updatePositionOccupied(newPosition, data.NC);
+    } else NCHandler.updatePositionOccupied(screenCenter, data.NC);
+
+    // Add to Narrow Channel variable;
+    NC = data.NC;
+    console.log(NC);
+    drawNC(NC);
   }
   shipsAfloat = data.genShipsAfloat;
   shipsAfloat.forEach((ship) => {
@@ -695,8 +807,9 @@ function drawShip(ship) {
         } else {
           $('#ship-cpa, #ship-cpa-sec').text(ship.range).toFixed(1);
         }
-        $('#ship-cpa, #ship-cpa-sec').text(pixelsToMiles(ship.cpa).toFixed(1));
-        $('#ship-tcpa, #ship-tcpa-sec').text(ship.tcpa.toFixed(1));
+        if (ship.tcpa) {
+          $('#ship-tcpa, #ship-tcpa-sec').text(ship.tcpa.toFixed(1));
+        }
       });
     }
 
@@ -821,55 +934,116 @@ function drawRR() {
   rangeRings.strokeColor = '#282828';
 }
 
-// Draw Range Rings
 function drawTSS(TSS) {
-  if (TSS.paths) TSS.paths.remove();
+  // if (TSS.paths) TSS.paths.remove();
 
-  const occupiedTrafficLane = new Rectangle(
-    new Point(0, 0),
-    new Size(TSS.length, TSS.trafficLanes.width)
-  );
-  occupiedTrafficLane.center = new Point(TSS.trafficLanes.occupiedPosition);
+  TSS.paths = new Group();
 
-  const otherTrafficLane = new Rectangle(
-    new Point(0, 0),
-    new Size(TSS.length, TSS.trafficLanes.width)
-  );
-  otherTrafficLane.center = new Point(TSS.trafficLanes.otherPosition);
+  const occupiedTrafficLaneBoundary = new Path.Line({
+    from: TSS.trafficLanes.occupied.corners[0],
+    to: TSS.trafficLanes.occupied.corners[1],
+  });
 
-  const sepZone = new Rectangle(
-    new Point(0, 0),
-    new Size(TSS.length, TSS.sepZone.width)
-  );
-  sepZone.center = new Point(TSS.sepZone.position);
+  const otherTrafficLaneBoundary = new Path.Line({
+    from: TSS.trafficLanes.other.corners[2],
+    to: TSS.trafficLanes.other.corners[3],
+  });
 
-  // Create a path for the outer boundaries of the traffic lanes
-  const occLaneOuterBoundary = new Path.Line(
-    occupiedTrafficLane.bottomLeft,
-    occupiedTrafficLane.bottomRight
-  );
-  const otherLaneOuterBoundary = new Path.Line(
-    otherTrafficLane.topLeft,
-    otherTrafficLane.topRight
-  );
+  const sepZonePath = new Path({
+    segments: TSS.sepZone.corners,
+    closed: true,
+    fillColor: '#bf1a80',
+    opacity: 0.75,
+  });
 
-  const sepZonePath = new Path.Rectangle(sepZone);
-
-  const trafficLanes = new Group([
-    occLaneOuterBoundary,
-    otherLaneOuterBoundary,
+  TSS.paths.addChildren([
+    occupiedTrafficLaneBoundary,
+    otherTrafficLaneBoundary,
+    sepZonePath,
   ]);
 
-  TSS.paths = new Group([trafficLanes, sepZonePath]);
+  // Set the dash pattern, stroke color, and stroke width for the traffic lanes outer boundaries
+  occupiedTrafficLaneBoundary.strokeWidth = 1;
+  occupiedTrafficLaneBoundary.dashArray = [10, 5];
+  occupiedTrafficLaneBoundary.strokeColor = '#bf1a80';
 
-  TSS.paths.rotate(TSS.orientation, new Point(centX, centY));
+  otherTrafficLaneBoundary.strokeWidth = 1;
+  otherTrafficLaneBoundary.dashArray = [10, 5];
+  otherTrafficLaneBoundary.strokeColor = '#bf1a80';
+}
+function drawNC(NC) {
+  NC.paths = new Group();
 
-  trafficLanes.strokeWidth = 1;
-  trafficLanes.dashArray = [10, 5]; // Set the dash pattern: 10 units long dash followed by 5 units gap
-  trafficLanes.strokeColor = '#bf1a80';
+  // const occupiedLaneBoundary = new Path.Line({
+  //   from: NC.lanes.occupied.corners[0],
+  //   to: NC.lanes.occupied.corners[1],
+  // });
 
-  sepZonePath.fillColor = '#bf1a80';
-  sepZonePath.opacity = 0.75;
+  // const otherLaneBoundary = new Path.Line({
+  //   from: NC.lanes.other.corners[2],
+  //   to: NC.lanes.other.corners[3],
+  // });
+
+  // const sepZonePath = new Path({
+  //   segments: NC.sepZone.corners,
+  //   closed: true,
+  //   fillColor: 'red',
+  //   opacity: 0.75,
+  // });
+
+  let channelMarkers = new Group();
+
+  const markerSize = onemile / 4;
+
+  const maxWidth = 3; // maximum width
+  const maxHeight = 5; // maximum height
+
+  NC.markers.portMarkers.forEach((marker) => {
+    const vecToCent = new Point(centX, centY).subtract(marker);
+    const distance = pixelsToMiles(vecToCent.length);
+    const factor = markerSize * Math.exp(-distance);
+    // Calculate width and height, ensure they don't exceed the maximum
+    const width = Math.min(factor * 10, maxWidth);
+    const height = Math.min(factor * 3, maxHeight);
+
+    const rectSize = new Size(width, height);
+    const topLeft = marker.subtract([rectSize.width / 2, rectSize.height / 2]);
+    let newMarker = new Path.Rectangle(topLeft, rectSize);
+    newMarker.rotate(vecToCent.angle + 90);
+    newMarker.fillColor = '#FAC728';
+    channelMarkers.addChild(newMarker);
+  });
+
+  NC.markers.starboardMarkers.forEach((marker) => {
+    const vecToCent = new Point(centX, centY).subtract(marker);
+    const distance = pixelsToMiles(vecToCent.length);
+    const factor = markerSize * Math.exp(-distance);
+    // Calculate width and height, ensure they don't exceed the maximum
+    const width = Math.min(factor * 10, maxWidth);
+    const height = Math.min(factor * 3, maxHeight);
+
+    const rectSize = new Size(width, height);
+    const topLeft = marker.subtract([rectSize.width / 2, rectSize.height / 2]);
+    let newMarker = new Path.Rectangle(topLeft, rectSize);
+    newMarker.rotate(vecToCent.angle + 90);
+    newMarker.fillColor = '#FAC728';
+    channelMarkers.addChild(newMarker);
+  });
+
+  NC.paths.addChildren([
+    // occupiedLaneBoundary,
+    // otherLaneBoundary,
+    // sepZonePath,
+    channelMarkers,
+  ]);
+
+  // Set the dash pattern, stroke color, and stroke width for the traffic lanes outer boundaries
+  // occupiedLaneBoundary.strokeColor = 'yellow';
+  // occupiedLaneBoundary.strokeWidth = 1;
+  // occupiedLaneBoundary.opacity = 0.75;
+  // otherLaneBoundary.strokeColor = 'green';
+  // otherLaneBoundary.strokeWidth = 1;
+  // otherLaneBoundary.opacity = 0.75;
 }
 
 //Clear selected in all ships
