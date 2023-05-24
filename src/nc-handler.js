@@ -1,4 +1,3 @@
-import { NC } from '../../test-lambda-nodejs18.x/scenario-generator/constructors/ncConstructor.mjs';
 import { getRectangleCorners } from './tss-handler.js';
 
 // Functions for handling the NC object.
@@ -56,7 +55,12 @@ export const updateCorners = function (newLength, newWidth, NCObject) {
   );
 };
 
-export const updatePositionOccupied = function (newPosition, NCObject) {
+export const updatePositionOccupied = function (
+  newPosition,
+  NCObject,
+  screenCenter,
+  oneMile
+) {
   // This function updates the position of all elements of the NC based on a new position for the occupied lane.
   NCObject.lanes.occupied.position = newPosition;
   NCObject.lanes.occupied.corners = getRectangleCorners(
@@ -105,9 +109,25 @@ export const updatePositionOccupied = function (newPosition, NCObject) {
     'occupied',
     NCObject.lanes.occupied.corners
   );
+  NCObject.markers.relPositionsPort = updateMarkerRelPositions(
+    NCObject.markers.portMarkers,
+    screenCenter,
+    oneMile
+  );
+  NCObject.markers.relPositionsStarboard = updateMarkerRelPositions(
+    NCObject.markers.starboardMarkers,
+    screenCenter,
+    oneMile
+  );
 };
 
-export const updateScale = function (NC, shipsAfloat, direction) {
+export const updateScale = function (
+  NC,
+  shipsAfloat,
+  direction,
+  screenCenter,
+  oneMile
+) {
   // Scale position
   const vecOCTLtoOS = NC.lanes.occupied.position.subtract(
     shipsAfloat[0].position
@@ -128,7 +148,7 @@ export const updateScale = function (NC, shipsAfloat, direction) {
     NC.length = NC.length / 2;
   }
   const newPosition = shipsAfloat[0].position.add(vecOCTLtoOS);
-  updatePositionOccupied(newPosition, NC);
+  updatePositionOccupied(newPosition, NC, screenCenter, oneMile);
 };
 
 function updateMarkers(
@@ -157,4 +177,27 @@ function updateMarkers(
     markers.push(position);
   }
   return markers;
+}
+
+function updateMarkerRelPositions(markers, screenCenter, oneMile) {
+  // Update rel position
+  const relPositions = [];
+  markers.forEach((marker) => {
+    relPositions.push(marker.subtract(screenCenter));
+    // convert to miles
+    relPositions[relPositions.length - 1].x = pixelsToMiles(
+      relPositions[relPositions.length - 1].x,
+      oneMile
+    );
+    relPositions[relPositions.length - 1].y = pixelsToMiles(
+      relPositions[relPositions.length - 1].y,
+      oneMile
+    );
+  });
+  return relPositions;
+}
+
+function pixelsToMiles(pixels, oneMile) {
+  const distanceInMiles = pixels / oneMile;
+  return distanceInMiles;
 }

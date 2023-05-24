@@ -121,7 +121,9 @@ import('paper').then(({ default: paper }) => {
       if (NC) {
         NCHandler.updatePositionOccupied(
           NC.lanes.occupied.position.add(event.delta.divide(2)),
-          NC
+          NC,
+          new Point(centX, centY),
+          onemile
         );
         drawNC(NC);
       }
@@ -271,7 +273,13 @@ function upDateScale(direction) {
       drawTSS(TSS);
     }
     if (NC) {
-      NCHandler.updateScale(NC, shipsAfloat, direction);
+      NCHandler.updateScale(
+        NC,
+        shipsAfloat,
+        direction,
+        new Point(centX, centY),
+        onemile
+      );
       drawNC(NC);
     }
 
@@ -300,7 +308,13 @@ function upDateScale(direction) {
       drawTSS(TSS);
     }
     if (NC) {
-      NCHandler.updateScale(NC, shipsAfloat, direction);
+      NCHandler.updateScale(
+        NC,
+        shipsAfloat,
+        direction,
+        new Point(centX, centY),
+        onemile
+      );
       drawNC(NC);
     }
     // Loop through every ship
@@ -372,7 +386,12 @@ const updateShips = function (delta) {
       let moveVector = shipsAfloat[0].vector.multiply(factor);
       moveVector.angle = shipsAfloat[0].vector.angle - 180;
       const newPosition = NC.lanes.occupied.position.add(moveVector);
-      NCHandler.updatePositionOccupied(newPosition, NC);
+      NCHandler.updatePositionOccupied(
+        newPosition,
+        NC,
+        new Point(centX, centY),
+        onemile
+      );
       drawNC(NC);
     }
     drawShip(shipsAfloat[0]);
@@ -539,8 +558,19 @@ const importScenario = function (data) {
       const scalesVecToCentre = vecToCentre.multiply(onemile);
       const newPosition = screenCenter.add(scalesVecToCentre);
       // Update positions
-      NCHandler.updatePositionOccupied(newPosition, data.NC);
-    } else NCHandler.updatePositionOccupied(screenCenter, data.NC);
+      NCHandler.updatePositionOccupied(
+        newPosition,
+        data.NC,
+        new Point(centX, centY),
+        onemile
+      );
+    } else
+      NCHandler.updatePositionOccupied(
+        screenCenter,
+        data.NC,
+        new Point(centX, centY),
+        onemile
+      );
 
     // Add to Narrow Channel variable;
     NC = data.NC;
@@ -1203,4 +1233,12 @@ function updateUSNRFrmOwnshp(ship, ownship) {
   );
 }
 
-export { calcvecLength, calcCPA, drawShip, updateShips, convertAngle };
+export {
+  calcvecLength,
+  calcCPA,
+  drawShip,
+  updateShips,
+  convertAngle,
+  pixelsToMiles,
+  NC,
+};

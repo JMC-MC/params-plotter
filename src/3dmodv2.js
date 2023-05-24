@@ -7,7 +7,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import { updateShips, convertAngle } from './app.js';
+import { updateShips, convertAngle, NC } from './app.js';
 
 // Declare variables
 let camera, scene, renderer;
@@ -115,8 +115,8 @@ function buildThreeDRendering() {
   const totalLoader = new Promise((resolve, reject) => {
     (async () => {
       try {
-        //Loop through shipsAfloat and create a promise for each model loader
         const proms = [];
+        //Loop through shipsAfloat and create a promise for each model loader
         window.shipsAfloat.slice(1).forEach((ship) => {
           proms.push(
             loaderProm(
@@ -129,6 +129,19 @@ function buildThreeDRendering() {
             )
           );
         });
+        // Add buoys for narrow channels
+        if (NC) {
+          NC.markers.relPositionsPort.forEach((marker, i) => {
+            proms.push(
+              loaderProm('/assets/VEIF.glb', marker.x, marker.y, 0, 'buoy')
+            );
+          });
+          NC.markers.relPositionsStarboard.forEach((marker, i) => {
+            proms.push(
+              loaderProm('/assets/VEIF.glb', marker.x, marker.y, 0, 'buoy')
+            );
+          });
+        }
         const all = await Promise.all(proms);
         resolve(all);
       } catch (err) {
@@ -331,17 +344,20 @@ function animate() {
           let shipName = scene.children[i].name;
           // Find the index number for ship with the same name from the shipsAfloat array
           // Defined in nameToIndex function
-          let indexNo = nameToIndex(shipName);
-          scene.children[i].position.set(
-            convertPos(window.shipsAfloat[indexNo].relposXnm),
-            0,
-            convertPos(window.shipsAfloat[indexNo].relposYnm)
-          );
-          // If after sunset or before sunrise control directional lights
-          if (parameters.elevation < 2 || parameters.elevation > 178) {
-            dLights(indexNo, scene.children[i]);
+          if (shipName != 'buoy') {
+            let indexNo = nameToIndex(shipName);
+            scene.children[i].position.set(
+              convertPos(window.shipsAfloat[indexNo].relposXnm),
+              0,
+              convertPos(window.shipsAfloat[indexNo].relposYnm)
+            );
+
+            // If after sunset or before sunrise control directional lights
+            if (parameters.elevation < 2 || parameters.elevation > 178) {
+              dLights(indexNo, scene.children[i]);
+            }
+            overHorizon(indexNo, scene.children[i]);
           }
-          overHorizon(indexNo, scene.children[i]);
           //Audio
           if ((shipName = '003')) {
             // Get audio element (last element in the model)
