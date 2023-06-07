@@ -7,14 +7,15 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import { updateShips, convertAngle, NC } from './app.js';
+import * as Convert from './utils/converters.js';
+import { updateShips, NC } from './app.js';
 
 // Declare variables
 let camera, scene, renderer;
 let water, sun;
 let bloomPass, bloomComposer, finalComposer, finalPass;
 const parameters = {
-  elevation: 0,
+  elevation: -10,
   azimuth: 90,
 };
 const fps = 30;
@@ -22,7 +23,11 @@ let now;
 let then = Date.now();
 const interval = 1000 / fps;
 let delta;
-
+let buoys = new THREE.Group();
+buoys.name = 'buoys';
+let dark;
+const buoyFlashInterval = 1000; // Milliseconds
+const buoyFlashLength = 1000; // Milliseconds
 // Declare variable for controls
 let zoomed = false;
 let turnRate = 0;
@@ -98,6 +103,29 @@ const loaderProm = (modelPath, relposXnm, relposYnm, course, name, type) => {
   });
 };
 
+const buoyLoaderProm = (modelPath, relposXnm, relposYnm, name, number) => {
+  return new Promise((resolve, reject) => {
+    loader.load(
+      modelPath,
+      function (gltf) {
+        let model = gltf.scene;
+        model.position.set(convertPos(relposXnm), 0, convertPos(relposYnm));
+        model.name = name;
+        model.number = number;
+        model.flashInterval = buoyFlashInterval;
+        model.flashLength = buoyFlashLength;
+        model.lightOn = true;
+        buoys.add(model);
+        resolve('success');
+      },
+      undefined,
+      function (err) {
+        reject(err);
+      }
+    );
+  });
+};
+
 function buildThreeDRendering() {
   //Rotate camera to own ships head
   // - pi/2 as the orientation for Paper JS is 90 degrees different.
@@ -133,16 +161,29 @@ function buildThreeDRendering() {
         if (NC) {
           NC.markers.relPositionsPort.forEach((marker, i) => {
             proms.push(
-              loaderProm('/assets/VEIF.glb', marker.x, marker.y, 0, 'buoy')
+              buoyLoaderProm(
+                '/assets/portMarker.glb',
+                marker.x,
+                marker.y,
+                `port_marker_${i}`,
+                i
+              )
             );
           });
           NC.markers.relPositionsStarboard.forEach((marker, i) => {
             proms.push(
-              loaderProm('/assets/VEIF.glb', marker.x, marker.y, 0, 'buoy')
+              buoyLoaderProm(
+                '/assets/stbMarker.glb',
+                marker.x,
+                marker.y,
+                `starboard_marker_${i}`,
+                i
+              )
             );
           });
         }
         const all = await Promise.all(proms);
+        if (NC) scene.add(buoys);
         resolve(all);
       } catch (err) {
         reject(err);
@@ -289,8 +330,10 @@ function buildThreeDRendering() {
     // Instrument display
 
     $('#course-display').append(
-      `<p>${addoos(
-        convertAngle(window.shipsAfloat[0].vector.angle).toFixed(1)
+      `<p>${Convert.brngToFourFigStrng(
+        Convert.vecAngleToCompassBrng(
+          window.shipsAfloat[0].vector.angle
+        ).toFixed(1)
       )}&deg;</p>`
     );
     $('#speed-display').append(
@@ -307,7 +350,13 @@ function buildThreeDRendering() {
   (async () => {
     try {
       await Promise.all([totalLoader, init]);
-      shipLightControl(parameters.elevation);
+      // Set dark variable
+      if (elevation > 2 && elevation < 178) dark = false;
+      else {
+        dark = true;
+        shipLightControl(dark);
+      }
+
       animate();
       $('.threeOverlay').hide();
       // startTime();
@@ -333,18 +382,17 @@ function animate() {
       updateShips(interval);
       // Only call if three canvas is visible
       if ($('#lookOut').is(':visible')) {
-        renderBloom();
+        if (dark) renderBloom();
         render();
         control();
         showBrng();
-        shipLightControl(parameters.elevation);
         // Animate ships movement
         // Ship models can be found in scene.children
         for (let i = 2; i < scene.children.length; i++) {
-          let shipName = scene.children[i].name;
-          // Find the index number for ship with the same name from the shipsAfloat array
-          // Defined in nameToIndex function
-          if (shipName != 'buoy') {
+          if (scene.children[i].name.startsWith('00')) {
+            let shipName = scene.children[i].name;
+            // Find the index number for ship with the same name from the shipsAfloat array
+            // Defined in nameToIndex function
             let indexNo = nameToIndex(shipName);
             scene.children[i].position.set(
               convertPos(window.shipsAfloat[indexNo].relposXnm),
@@ -352,19 +400,70 @@ function animate() {
               convertPos(window.shipsAfloat[indexNo].relposYnm)
             );
 
-            // If after sunset or before sunrise control directional lights
-            if (parameters.elevation < 2 || parameters.elevation > 178) {
+            // If dark control directional lights
+            if (dark) {
               dLights(indexNo, scene.children[i]);
             }
-            overHorizon(indexNo, scene.children[i]);
+            overHorizon(indexNo, scene.children[i]); // If ship over 11nm away make invisible
+            //Audio
+            if ((shipName = '003')) {
+              // Get audio element (last element in the model)
+              const audio =
+                scene.children[i].children[
+                  scene.children[i].children.length - 1
+                ];
+              if (audio.isPlaying == false) {
+                audio.play();
+              }
+            }
           }
-          //Audio
-          if ((shipName = '003')) {
-            // Get audio element (last element in the model)
-            const audio =
-              scene.children[i].children[scene.children[i].children.length - 1];
-            if (audio.isPlaying == false) {
-              audio.play();
+          // Animate buoys
+          if (NC && scene.children[i].name == 'buoys') {
+            for (let j = 0; j < scene.children[i].children.length; j++) {
+              const MarkerNumber = scene.children[i].children[j].number;
+              if (scene.children[i].children[j].name.startsWith('port')) {
+                const range = Math.sqrt(
+                  Math.pow(NC.markers.relPositionsPort[MarkerNumber].x, 2) +
+                    Math.pow(NC.markers.relPositionsPort[MarkerNumber].y, 2)
+                );
+                if (range > 11) scene.children[i].children[j].visible = false;
+                else {
+                  scene.children[i].children[j].visible = true;
+                  scene.children[i].children[j].position.set(
+                    convertPos(NC.markers.relPositionsPort[MarkerNumber].x),
+                    0,
+                    convertPos(NC.markers.relPositionsPort[MarkerNumber].y)
+                  );
+                }
+              } else if (
+                scene.children[i].children[j].name.startsWith('starboard')
+              ) {
+                const range = Math.sqrt(
+                  Math.pow(
+                    NC.markers.relPositionsStarboard[MarkerNumber].x,
+                    2
+                  ) +
+                    Math.pow(
+                      NC.markers.relPositionsStarboard[MarkerNumber].y,
+                      2
+                    )
+                );
+                // Make invisible if over 11nm
+                if (range > 11) scene.children[i].children[j].visible = false;
+                else {
+                  scene.children[i].children[j].visible = true;
+                  scene.children[i].children[j].position.set(
+                    convertPos(
+                      NC.markers.relPositionsStarboard[MarkerNumber].x
+                    ),
+                    0,
+                    convertPos(NC.markers.relPositionsStarboard[MarkerNumber].y)
+                  );
+                }
+              }
+              // Animate Flashing light
+              if (scene.children[i].children[j].visible == true && dark)
+                flashLight(scene.children[i].children[j]);
             }
           }
         }
@@ -418,7 +517,7 @@ function dLights(indexNo, shipObject) {
   });
 }
 
-// ShipsAfloat and Scene do not have the ships in the same order. There for match name to index.
+// ShipsAfloat and Scene do not have the ships in the same order. Therefore match name to index.
 function nameToIndex(shipName) {
   return window.shipsAfloat.findIndex(function checkName(array) {
     return array.name == shipName;
@@ -426,13 +525,45 @@ function nameToIndex(shipName) {
 }
 // Ship Lights functions
 
-function shipLightControl(elevation) {
-  // Turn off lights after sun rise and before sun set
-  scene.traverse((obj) => {
-    if (obj.name.includes('light') && elevation > 2 && elevation < 178) {
-      obj.visible = false;
-    } else if (obj.name.includes('light')) obj.visible = true;
-  });
+function shipLightControl(dark) {
+  // All lights are visible by default
+  // Turn off all lights if dark is false
+  if (!dark) {
+    scene.traverse((obj) => {
+      if (obj.name.includes('light')) {
+        obj.visible = false;
+      }
+    });
+  }
+}
+
+function startFlashing(buoy) {
+  const randomTimeDelta = Math.random() * buoyFlashLength;
+  buoy.lastSwitch = Date.now() - randomTimeDelta;
+}
+
+function flashLight(buoy) {
+  if (!buoy.lastSwitch) startFlashing(buoy); // Start flashing sequence at different times
+  const timeSinceSwitch = Date.now() - buoy.lastSwitch;
+  // If light is on and time since last switch is greater than flash length turn it off
+  if (buoy.lightOn && timeSinceSwitch > buoy.flashLength) {
+    buoy.traverse((obj) => {
+      if (obj.name.includes('light')) {
+        obj.visible = false;
+      }
+      buoy.lightOn = false;
+      buoy.lastSwitch = Date.now();
+    });
+    // If light is off and time since last switch is greater than flash interval length turn it on
+  } else if (!buoy.lightOn && timeSinceSwitch > buoy.flashInterval) {
+    buoy.traverse((obj) => {
+      if (obj.name.includes('light')) {
+        obj.visible = true;
+      }
+      buoy.lightOn = true;
+      buoy.lastSwitch = Date.now();
+    });
+  }
 }
 
 function control() {
@@ -449,20 +580,6 @@ function control() {
 }
 
 //Bearing Display
-// Add 00s for compass bearing
-function addoos(bearing) {
-  var BrngAsString;
-  // Add 0s when required
-  if (bearing >= 100) return bearing;
-  else if (bearing > 9) {
-    BrngAsString = '0' + bearing;
-    return BrngAsString;
-  } else {
-    BrngAsString = '00' + bearing;
-    return BrngAsString;
-  }
-}
-
 let currentBearing = '';
 
 function showBrng() {
@@ -486,7 +603,7 @@ function showBrng() {
     // Add 90 degrees
     if (bearing < 0) bearing += 2 * Math.PI;
     let rounded = Math.round((bearing * 180) / Math.PI);
-    bearings[index] = addoos(rounded);
+    bearings[index] = Convert.brngToFourFigStrng(rounded);
   });
   $('#orientator').css('transform', 'rotate(' + bearings[2] + 'deg)');
   $('#vis-bearing').text('');
@@ -703,7 +820,8 @@ const bearingLogger = function (clickedCompass) {
   window.shipsAfloat.slice(1).forEach((ship) => {
     // Get absolute difference between currentBearing and ship bearing
     const bearingDiff = Math.abs(
-      convertAngle(Math.round(ship.vecOwnShip.angle)) - currentBearing
+      Convert.vecAngleToCompassBrng(Math.round(ship.vecOwnShip.angle)) -
+        currentBearing
     );
     if (dwellTime > 1000 && bearingDiff < 3) {
       -console.log(

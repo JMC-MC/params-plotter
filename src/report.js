@@ -1,6 +1,8 @@
 // Import values from app
-import { calcvecLength, calcCPA } from './app.js';
+import { params } from './app.js';
 import cloneDeep from 'lodash/cloneDeep';
+import * as Calculate from './utils/calculators.js';
+
 // JQUERY adjustment to get number for number inputs
 $.valHooks.number = {
   get: function (elem) {
@@ -402,7 +404,11 @@ const intentionsHandler = function () {
     if (turnDirection == 'port') reportShipsAfloat[0].course -= radians;
     if (turnDirection == 'starboard') reportShipsAfloat[0].course += radians;
     // Adjust own ship vec end
-    const vecLength = calcvecLength(reportShipsAfloat[0].speed);
+    const vecLength = Calculate.vecLengthInPixels(
+      reportShipsAfloat[0].speed,
+      params.shipVctrLngth,
+      params.onemile
+    );
     const endX =
       Math.cos(reportShipsAfloat[0].course) * vecLength +
       reportShipsAfloat[0].position.x;
@@ -417,7 +423,12 @@ const intentionsHandler = function () {
     for (var i = 0; i < reportShipsAfloat.length; i++) {
       var ship = reportShipsAfloat[i];
       if (ship.constructor.name == 'Ship') {
-        calcCPA(ship, reportShipsAfloat[0]);
+        Calculate.CPA(
+          ship,
+          reportShipsAfloat[0],
+          params.shipVctrLngth,
+          params.onemile
+        );
       }
     }
   }
@@ -428,7 +439,11 @@ const intentionsHandler = function () {
     if (speedDirection == 'decrease') reportShipsAfloat[0].speed -= speedAmount;
 
     // Adjust own ship vec end
-    const vecLength = calcvecLength(reportShipsAfloat[0].speed);
+    const vecLength = Calculate.vecLengthInPixels(
+      reportShipsAfloat[0].speed,
+      params.shipVctrLngth,
+      params.onemile
+    );
     const endX =
       Math.cos(reportShipsAfloat[0].course) * vecLength +
       reportShipsAfloat[0].position.x;
@@ -444,7 +459,12 @@ const intentionsHandler = function () {
     for (var i = 0; i < reportShipsAfloat.length; i++) {
       var ship = reportShipsAfloat[i];
       if (ship.constructor.name == 'Ship') {
-        calcCPA(ship, reportShipsAfloat[0]);
+        Calculate.CPA(
+          ship,
+          reportShipsAfloat[0],
+          params.shipVctrLngth,
+          params.onemile
+        );
       }
     }
   }
