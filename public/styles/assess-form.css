@@ -1,0 +1,320 @@
+#regForm {
+  background-color: #ffffff;
+  margin: 0 auto;
+  padding: 40px;
+  width: 70%;
+  min-width: 300px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.tab input {
+  padding: 10px;
+  padding-right: 0;
+  width: 7ch;
+  height: 19px;
+  border: 1px solid;
+  font-size: 15px;
+}
+.decPlace {
+  width: 60px;
+}
+
+select {
+  font-size: 15px;
+  height: 22px;
+  border: 1px solid;
+}
+
+input[type='checkbox'] {
+  width: 25px;
+  margin-left: 12.5px;
+}
+
+/* Mark input boxes that gets an error on validation: */
+input.invalid {
+  background-color: #ffdddd;
+}
+
+/* Hide all steps by default: */
+.tab {
+  display: none;
+}
+
+button {
+  background-color: #1a9cbf;
+  color: #ffffff;
+  border: none;
+  padding: 3px 18px;
+  font-size: 15px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#resetBtn {
+  background-color: #bbbbbb;
+}
+
+#actionBtn {
+  margin-left: 5px;
+}
+
+#nextCnt {
+  margin-left: 5px;
+  background-color: #bbbbbb;
+}
+
+#nextBtn {
+  margin-left: 5px;
+}
+
+#submitBtn {
+  margin-left: 5px;
+}
+
+/* Make circles that indicate the steps of the form: */
+.step {
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbbbbb;
+  border: none;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.5;
+}
+
+.step.active {
+  opacity: 1;
+}
+
+/* Mark the steps that are finished and valid: */
+.step.finish {
+  background-color: #1a9cbf;
+}
+
+#drop-zone {
+  width: 500px;
+  max-height: 500px;
+  background-color: #eeeeee;
+  border-radius: 3px;
+  border: #bbbbbb 2px solid;
+  box-shadow: inset 0px 0px 25px rgba(0, 0, 0, 0.2);
+  overflow-y: scroll;
+  height: 400px;
+}
+
+#rule-list {
+  overflow-y: scroll;
+  height: 400px;
+  margin-right: 12px;
+}
+
+.container-report {
+  display: flex;
+  padding: 0;
+  margin-bottom: 6px;
+  flex-direction: row;
+}
+.rule-box {
+  padding-left: 18px;
+  padding-right: 18px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  background-color: #75c3d8;
+  margin-bottom: 6px;
+  border-radius: 3px;
+  position: relative;
+}
+.subpart {
+  margin-top: 6px;
+  padding-left: 18px;
+  padding-right: 18px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  background-color: #a3d7e5;
+  margin-bottom: 6px;
+  border-radius: 3px;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+.subsubpart {
+  margin-top: 6px;
+  padding-left: 18px;
+  padding-right: 18px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  background-color: #d1ebf2;
+  margin-bottom: 6px;
+  border-radius: 3px;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.dropList {
+  display: none;
+}
+
+.removeEl {
+  position: absolute;
+  top: 9px;
+  right: 18px;
+  cursor: pointer;
+}
+
+.arrow {
+  transition: 0.25s ease;
+}
+
+.arrow-animate {
+  transform: rotate(90deg);
+  transition: 0.25s ease;
+}
+
+.listEl-rr,
+.listEl-ncl {
+  margin-top: 6px;
+  padding-left: 18px;
+  padding-right: 18px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  background-color: #d1ebf2;
+  margin-bottom: 6px;
+  position: relative;
+  max-width: 450px;
+}
+
+.listEl-ncl {
+  background-color: #a3d7e5;
+}
+
+label {
+  font-weight: 400;
+  font-size: 20px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+form h3 {
+  font-weight: 900;
+}
+
+.regular-font {
+  font-size: 15px;
+  font-weight: 0;
+}
+
+.report-row {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#submit-message {
+  display: none;
+}
+
+#rule-list {
+  background-color: #f2f2f2;
+  border: #bbbbbb 2px solid;
+  border-radius: 5px;
+  padding: 12px 12px;
+}
+
+#relBearingCont {
+  margin-left: 2px;
+}
+
+#cpaPos {
+  margin-left: 2px;
+}
+
+.addButton {
+  color: #1a9cbf;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+.thumbsUp {
+  width: 60px;
+  height: 60px;
+}
+
+#form-btns {
+  overflow: auto;
+}
+.float-right {
+  float: right;
+}
+
+#form-circles {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.draggable {
+  z-index: 1000; /* Set a higher z-index than the drop zone's z-index */
+  cursor: grab; /* Set a cursor that doesn't hide the helper element */
+}
+
+.dropDown {
+  cursor: pointer;
+}
+
+ul.tree {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+ul.tree li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0 1em;
+  line-height: 2em;
+  position: relative;
+}
+ul.tree li:before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 0;
+  left: -1em;
+  margin-top: 1em;
+}
+ul.tree li:last-child:before {
+  height: 1em;
+  position: absolute;
+  top: 0;
+  left: -1em;
+  margin-top: -1em;
+}
+ul.tree ul {
+  margin-left: 1em;
+  display: none;
+}
+.checkbox {
+  margin-right: 5px;
+}
+.expand {
+  font-weight: normal;
+  cursor: pointer;
+}
+.expand:before {
+  content: '\25B6';
+  display: inline-block;
+  margin-right: 5px;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease-out;
+}
+.expand.active:before {
+  transform: rotate(90deg);
+}
+.sublist {
+  margin-left: 1em;
+}
