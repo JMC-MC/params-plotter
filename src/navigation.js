@@ -8,8 +8,12 @@ import {
 } from './report';
 // When document is ready
 $(function () {
+  // Radar screen is active on load
+  $('#radar-button').addClass('activeclicked'); // Make radar-button active on page load
+
   // Navigation
   $('#lookout-button').on('touchstart mousedown', function () {
+    setActiveMenu(this);
     // Switch Screens
     $('#radar').hide();
     $('#lookOut').show();
@@ -18,6 +22,7 @@ $(function () {
   });
 
   $('#radar-button').on('touchstart mousedown', function () {
+    setActiveMenu(this);
     // Switch Screens
     $('#radar').show();
     $('#lookOut').hide();
@@ -26,13 +31,12 @@ $(function () {
     $('#staff-answer').hide();
 
     setTimeout(() => {
-      console.log('attempting to fire resize')
-      $(window).trigger('resize');
-    },300)
-
+      window.dispatchEvent(new CustomEvent('resize'));
+    }, 100);
   });
 
   $('#rules-button').on('touchstart mousedown', function () {
+    setActiveMenu(this);
     // Switch Screens
     $('#radar').hide();
     $('#lookOut').hide();
@@ -41,6 +45,7 @@ $(function () {
   });
 
   $('#edit-button').on('touchstart mousedown', function () {
+    setActiveMenu(this);
     // Switch Screens
     $('#radar').show();
     $('#lookOut').hide();
@@ -50,9 +55,10 @@ $(function () {
     $('#debrief-view').hide();
     updateTgtList();
   });
-  // Report View
 
+  // Report View
   $('#report-button').on('touchstart mousedown', function () {
+    setActiveMenu(this);
     $('#myModal').show();
     showTab();
   });
@@ -70,4 +76,9 @@ $(function () {
   $('#actionBtn').on('mousedown touchstart', intentions);
 
   $('#submitBtn').on('mousedown touchstart', submitRep);
+
+  function setActiveMenu(item) {
+    $('.activeclicked').removeClass('activeclicked');
+    $(item).addClass('activeclicked');
+  }
 });
