@@ -11,7 +11,7 @@ import * as Convert from './utils/converters.js';
 import * as Calculate from './utils/calculators.js';
 import * as Draw from './drawPaperElements.js';
 import { radToDeg } from 'three/src/math/MathUtils.js';
-
+import * as RadarControls from './radar/controls.js';
 // Make the paper scope global, by injecting it into window:
 import('paper').then(({ default: paper }) => {
   paper.install(window);
@@ -22,19 +22,17 @@ import('paper').then(({ default: paper }) => {
     paper.setup(myCanvas);
     var tool = new Tool();
     // Parameters
-    //Res Vis
-    window.resVis = false;
-    //Sun Elevation
-    window.elevation = '';
-    // Animation state
-    window.play = true;
-    //Scale
-    window.scale = 12;
+    params.resVis = false;
+    params.elevation = null;
+    params.play = true;
+    params.scale = 12;
+    params.centX = myCanvas.getBoundingClientRect().width / 2;
+    params.centY = myCanvas.getBoundingClientRect().height / 2;
 
-    $('#range-scale, #range-scale-sec').text(scale);
-    // Get centre X and Y and declare as global variables
-    window.centX = myCanvas.getBoundingClientRect().width / 2;
-    window.centY = myCanvas.getBoundingClientRect().height / 2;
+    RadarControls.init();
+
+    $('#range-scale, #range-scale-sec').text(params.scale);
+
     //Get shortest dimension
     function getScale() {
       if (
@@ -47,16 +45,16 @@ import('paper').then(({ default: paper }) => {
       }
       // Set shortest dim at 24nm
       // This creates a 12nm range scale
-      params.onemile = shortDim / (scale * 2);
+      params.onemile = shortDim / (params.scale * 2);
     }
 
     // Adjust range/vectors function
     $('#minus-range, #minus-range-sec').click(function () {
       // Confirm request is within limits
-      if (scale > 1.5) {
+      if (params.scale > 1.5) {
         // change scale and update number on info panel
-        scale = scale / 2;
-        $('#range-scale, #range-scale-sec').text(scale);
+        params.scale = params.scale / 2;
+        $('#range-scale, #range-scale-sec').text(params.scale);
         // Call function to update canvas
         const direction = 'minus';
         upDateScale(direction);
@@ -65,10 +63,10 @@ import('paper').then(({ default: paper }) => {
 
     $('#plus-range, #plus-range-sec').click(function () {
       // Confirm request is within limits
-      if (scale < 48) {
+      if (params.scale < 48) {
         // change scale and update number on info panel
-        scale = scale * 2;
-        $('#range-scale, #range-scale-sec').text(scale);
+        params.scale = params.scale * 2;
+        $('#range-scale, #range-scale-sec').text(params.scale);
         // Call function to update canvas
         const direction = 'plus';
         upDateScale(direction);
@@ -112,9 +110,9 @@ import('paper').then(({ default: paper }) => {
     view.onResize = function (event) {
       console.log('paper JS resizing');
       // Update centre position.
-      centX = myCanvas.getBoundingClientRect().width / 2;
-      centY = myCanvas.getBoundingClientRect().height / 2;
-      Draw.radarRings(project, centX, centY, params.onemile);
+      params.centX = myCanvas.getBoundingClientRect().width / 2;
+      params.centY = myCanvas.getBoundingClientRect().height / 2;
+      Draw.radarRings(project, params.centX, params.centY, params.onemile);
       if (TSS) {
         TSSHandler.updatePositionOccupied(
           TSS.trafficLanes.occupied.position.add(event.delta.divide(2)),
@@ -213,7 +211,7 @@ import('paper').then(({ default: paper }) => {
 
     // Once all element are loaded draw range rings on radar
     getScale();
-    Draw.radarRings(project, centX, centY, params.onemile);
+    Draw.radarRings(project, params.centX, params.centY, params.onemile);
 
     // Load Scenario
     checkData();
@@ -233,7 +231,7 @@ import('paper').then(({ default: paper }) => {
     updateTgtList();
 
     // Change form if in restricted visibility mode
-    if (window.resVis) {
+    if (params.resVis) {
       $('#type-vis').hide();
       $('#type-resvis').show();
     } else {
@@ -272,7 +270,7 @@ function upDateScale(direction) {
   if (direction == 'minus') {
     params.onemile += params.onemile;
 
-    Draw.radarRings(project, centX, centY, params.onemile);
+    Draw.radarRings(project, params.centX, params.centY, params.onemile);
     if (TSS) {
       TSSHandler.updateScale(TSS, shipsAfloat, direction);
       Draw.TSS(TSS);
@@ -282,7 +280,7 @@ function upDateScale(direction) {
         NC,
         shipsAfloat,
         direction,
-        new Point(centX, centY),
+        new Point(params.centX, params.centY),
         params.onemile
       );
       Draw.narrowChannel(NC, params.onemile);
@@ -307,7 +305,7 @@ function upDateScale(direction) {
     }
   } else {
     params.onemile = params.onemile / 2;
-    Draw.radarRings(project, centX, centY, params.onemile);
+    Draw.radarRings(project, params.centX, params.centY, params.onemile);
     if (TSS) {
       TSSHandler.updateScale(TSS, shipsAfloat, direction);
       Draw.TSS(TSS);
@@ -317,7 +315,7 @@ function upDateScale(direction) {
         NC,
         shipsAfloat,
         direction,
-        new Point(centX, centY),
+        new Point(params.centX, params.centY),
         params.onemile
       );
       Draw.narrowChannel(NC, params.onemile);
@@ -372,8 +370,8 @@ function updateVecLen(direction) {
 // Move shipsAfloat and features
 const updateShips = function (delta) {
   const deltaSecs = delta / 1000;
-  if (play == true) {
-    Draw.radarRings(project, centX, centY, params.onemile);
+  if (params.play == true) {
+    Draw.radarRings(project, params.centX, params.centY, params.onemile);
     // Update TSS
     if (TSS) {
       const OSvecInSec = shipsAfloat[0].vector.length * 60;
@@ -455,10 +453,10 @@ const checkData = function () {
 // Import and process generated Scenario
 const importScenario = function (data) {
   setupEnvironment(data);
-  elevation = -10; // TODO: Get elevation from data
-  resVis = data.resVis;
+  params.elevation = -10; // TODO: Get elevation from data
+  params.resVis = data.resVis;
   // Find vector from gen centre to screen center
-  const screenCenter = new Point(centX, centY);
+  const screenCenter = new Point(params.centX, params.centY);
   // Intialise paperjs point
   data.center = new Point(data.center[0], data.center[1]);
   const delta = screenCenter.subtract(data.center);

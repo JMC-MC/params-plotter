@@ -293,11 +293,11 @@ function updateContactReports() {
   // Range
   contactReports[currentReport].range.actual = realContDetails.range.toFixed(2);
   //Type
-  if (window.resVis)
+  if (params.resVis)
     contactReports[currentReport].type.actual = realContDetails.typeSound;
   else contactReports[currentReport].type.actual = realContDetails.type;
   // Held by
-  if (window.resVis || contactReports[currentReport].range.actual > 11)
+  if (params.resVis || contactReports[currentReport].range.actual > 11)
     contactReports[currentReport].held.actual.visual = false;
   else contactReports[currentReport].held.actual.visual = true;
   contactReports[currentReport].held.actual.radar = true;
@@ -335,7 +335,7 @@ function updateContactReports() {
     contactReports[currentReport].relColour.reported = $('#relColour').val();
     contactReports[currentReport].relBearing.reported = $('#relBearing').val();
     contactReports[currentReport].range.reported = $('#range').val();
-    if (window.resVis)
+    if (params.resVis)
       contactReports[currentReport].type.reported = $('#type-resvis').val();
     else contactReports[currentReport].type.reported = $('#type-vis').val();
     contactReports[currentReport].held.reported.visual =

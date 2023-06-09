@@ -8,7 +8,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as Convert from './utils/converters.js';
-import { updateShips, NC } from './app.js';
+import { updateShips, NC, params } from './app.js';
 
 // Declare variables
 let camera, scene, renderer;
@@ -78,7 +78,7 @@ const loaderProm = (modelPath, relposXnm, relposYnm, course, name, type) => {
         // Three JS rotates anti-clockwise, subtract angles from Paper JS
         model.rotation.y = -course;
         model.name = name;
-        if (window.resVis) {
+        if (params.resVis) {
           // Add audio
           audioLoader.load(getAudioPath(type), function (buffer) {
             const audio = new THREE.PositionalAudio(listener);
@@ -137,7 +137,7 @@ function buildThreeDRendering() {
       'deg)'
   );
 
-  parameters.elevation = window.elevation;
+  parameters.elevation = params.elevation;
 
   // Start async loading models as soon as page loads
   const totalLoader = new Promise((resolve, reject) => {
@@ -250,7 +250,7 @@ function buildThreeDRendering() {
     let renderTarget;
 
     //Fog
-    if (window.resVis) {
+    if (params.resVis) {
       skyUniforms['mieCoefficient'].value = 0.8;
       skyUniforms['mieDirectionalG'].value = 0.5;
       scene.fog = new THREE.Fog(0x484849, 1000, 1100);
@@ -351,7 +351,7 @@ function buildThreeDRendering() {
     try {
       await Promise.all([totalLoader, init]);
       // Set dark variable
-      if (elevation > 2 && elevation < 178) dark = false;
+      if (parameters.elevation > 2 && parameters.elevation < 178) dark = false;
       else {
         dark = true;
         shipLightControl(dark);
@@ -359,8 +359,6 @@ function buildThreeDRendering() {
 
       animate();
       $('.threeOverlay').hide();
-      // startTime();
-      console.log(scene);
     } catch (err) {
       console.log(err);
     }
@@ -369,7 +367,7 @@ function buildThreeDRendering() {
 
 function animate() {
   requestAnimationFrame(animate);
-  if (window.play === true) {
+  if (params.play === true) {
     now = Date.now();
     delta = now - then;
 

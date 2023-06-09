@@ -2,7 +2,7 @@ const db = require('../db.js');
 const axios = require('axios');
 class View {
   static async generateScenario() {
-    const scenario_context = 'NC';
+    const scenario_context = 'TSS';
     const scenario_environment = 'day';
     const traffic_level = 1;
     // const id = '2fbf682a-fb45-4c62-ac79-642d38324b11';
