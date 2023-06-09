@@ -11,7 +11,7 @@ class View {
       const response = await axios.get(
         `http://127.0.0.1:3000?scenario_context=${scenario_context}&scenario_environment=${scenario_environment}&traffic_level=${traffic_level}`
       );
-      console.log(response.data.message.genShipsAfloat);
+      console.log(response.data.message);
       return response.data.message;
     } catch (err) {
       console.error(err);

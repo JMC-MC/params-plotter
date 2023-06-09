@@ -12,6 +12,226 @@ import * as Calculate from './utils/calculators.js';
 import * as Draw from './drawPaperElements.js';
 import { radToDeg } from 'three/src/math/MathUtils.js';
 import * as RadarControls from './radar/controls.js';
+
+// window.importedScenario = {
+//   genShipsAfloat: [
+//     {
+//       position: {
+//         x: 500,
+//         y: 500,
+//       },
+//       type: 'Own Ship',
+//       posSelected: false,
+//       vecSelected: false,
+//       course: 2.448494543579664,
+//       speed: 12.38923182407192,
+//     },
+//     {
+//       position: {
+//         x: 500.44,
+//         y: 503.99,
+//       },
+//       speed: 16.313271953039134,
+//       course: 4.019290870374561,
+//       CPA_TCPA: {
+//         cpa: 0.2688247636399771,
+//         tcpa: 11.730881959286085,
+//       },
+//       AFOSH: -56.624923250650994,
+//       type: 'PDV',
+//       typeSound: '',
+//       posSelected: false,
+//       vecSelected: false,
+//       targetSelected: false,
+//       name: '002',
+//       rules: ['10(k)'],
+//       bearings: [],
+//       bearingsTaken: [],
+//       selectCount: 0,
+//       interactsWithOwnship: true,
+//       fogSignal: 'https://example.com',
+//     },
+//     {
+//       position: {
+//         x: 512.3917073304037,
+//         y: 496.17619412730204,
+//       },
+//       speed: 8.594546896187406,
+//       course: 0.9516309261703322,
+//       CPA_TCPA: {
+//         cpa: 3.0353595655500727,
+//         tcpa: 52.00092152500863,
+//       },
+//       AFOSH: null,
+//       type: 'PDV',
+//       typeSound: '',
+//       posSelected: false,
+//       vecSelected: false,
+//       targetSelected: false,
+//       name: '001',
+//       rules: [],
+//       bearings: [],
+//       bearingsTaken: [],
+//       selectCount: 0,
+//       interactsWithOwnship: false,
+//       fogSignal: 'https://example.com',
+//     },
+//     {
+//       position: {
+//         x: 490.60842543787794,
+//         y: 501.95802255743376,
+//       },
+//       speed: 5.695516826992639,
+//       course: 3.092793445893089,
+//       CPA_TCPA: {
+//         cpa: 7.510109955360304,
+//         tcpa: -41.89165377252692,
+//       },
+//       AFOSH: null,
+//       type: 'PDV',
+//       typeSound: '',
+//       posSelected: false,
+//       vecSelected: false,
+//       targetSelected: false,
+//       name: '003',
+//       rules: [],
+//       bearings: [],
+//       bearingsTaken: [],
+//       selectCount: 0,
+//       interactsWithOwnship: false,
+//       fogSignal: 'https://example.com',
+//     },
+//     {
+//       position: {
+//         x: 510.5289584241312,
+//         y: 494.5239797479549,
+//       },
+//       speed: 10.06558678847995,
+//       course: -0.693098110010129,
+//       CPA_TCPA: {
+//         cpa: 2.514659774907961,
+//         tcpa: 30.991226185911046,
+//       },
+//       AFOSH: null,
+//       type: 'PDV',
+//       typeSound: '',
+//       posSelected: false,
+//       vecSelected: false,
+//       targetSelected: false,
+//       name: '004',
+//       rules: [],
+//       bearings: [],
+//       bearingsTaken: [],
+//       selectCount: 0,
+//       interactsWithOwnship: false,
+//       fogSignal: 'https://example.com',
+//     },
+//   ],
+//   center: [500, 500],
+//   TSS: {
+//     length: 25,
+//     orientation: 2.448494543579664,
+//     totalWidth: 4,
+//     trafficLanes: {
+//       width: 1.75,
+//       occupied: {
+//         position: {
+//           x: 499.3891310957741,
+//           y: 500.4401800929255,
+//         },
+//         corners: [
+//           {
+//             x: 489.2141948255395,
+//             y: 507.7536127272406,
+//           },
+//           {
+//             x: 508.4459511910137,
+//             y: 491.7805245130272,
+//           },
+//           {
+//             x: 509.56406736600866,
+//             y: 493.12674745861045,
+//           },
+//           {
+//             x: 490.33231100053445,
+//             y: 509.0998356728238,
+//           },
+//         ],
+//         moveVector: {
+//           x: 0.7511646956702864,
+//           y: 0.05168106361782632,
+//         },
+//         OrientateMoveVector: {
+//           x: -0.6108689042259368,
+//           y: 0.44018009292550603,
+//         },
+//       },
+//       other: {
+//         position: {
+//           x: 500.8291310957741,
+//           y: 502.17018009292553,
+//         },
+//         corners: [
+//           {
+//             x: 490.6541948255395,
+//             y: 509.4836127272406,
+//           },
+//           {
+//             x: 509.8859511910137,
+//             y: 493.51052451302724,
+//           },
+//           {
+//             x: 511.00406736600866,
+//             y: 494.85674745861047,
+//           },
+//           {
+//             x: 491.77231100053444,
+//             y: 510.82983567282383,
+//           },
+//         ],
+//       },
+//     },
+//     sepZone: {
+//       width: 0.5,
+//       position: {
+//         x: 500.1091310957741,
+//         y: 501.3101800929255,
+//       },
+//       corners: [
+//         {
+//           x: 488.8935220308948,
+//           y: 507.36440663637745,
+//         },
+//         {
+//           x: 508.125278396369,
+//           y: 491.3913184221641,
+//         },
+//         {
+//           x: 508.4447401606533,
+//           y: 491.77595354947357,
+//         },
+//         {
+//           x: 489.21298379517907,
+//           y: 507.74904176368693,
+//         },
+//       ],
+//     },
+//   },
+//   env: 'day',
+//   context: 'TSS',
+// };
+
+// Listener for data
+window.addEventListener(
+  'message',
+  function (event) {
+    // Do something with event.data, which contains the message sent from the parent
+    window.importedScenario = event.data;
+    console.log('Received message');
+  },
+  false
+);
+
 // Make the paper scope global, by injecting it into window:
 import('paper').then(({ default: paper }) => {
   paper.install(window);
@@ -442,10 +662,13 @@ const updateShips = function (delta) {
 };
 const checkData = function () {
   if (window.importedScenario) {
+    console.log(window.importedScenario);
     importScenario(window.importedScenario);
+    // Update status to indicate data is loaded
+    document.getElementById('status').innerText = '';
   } else {
     // Data is not loaded yet, schedule next check
-    console.log("Didn't load");
+    document.getElementById('status').innerText = 'Waiting for data';
     window.requestAnimationFrame(checkData);
   }
 };
