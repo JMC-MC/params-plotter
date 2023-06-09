@@ -288,11 +288,11 @@ canvas[resize] {
 }
 
 @media only screen and (max-width: 602px) {
-  .nav-bar{
+  .nav-bar {
     font-size: 10px;
   }
 
-  .nav-bar p{
+  .nav-bar p {
     font-size: 12px;
   }
 }
@@ -979,8 +979,8 @@ button {
 }
 
 .drop1 {
-  width: 90px;
-  height: 16px;
+  width: 115px;
+  height: 98px;
   bottom: 2px;
   border-radius: 0;
 }
