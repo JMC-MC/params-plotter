@@ -60,12 +60,12 @@ var loader = new GLTFLoader();
 // Create object with types of vessels and paths to audio
 
 const fogSignals = {
-  PDV: '/assets/pdv-fog-signal.mp3',
-  SV: '/assets/lame-duck-fog-signal.mp3',
-  VEIF: '/assets/lame-duck-fog-signal.mp3',
-  NUC: '/assets/lame-duck-fog-signal.mp3',
-  RAM: '/assets/lame-duck-fog-signal.mp3',
-  anchorless100m: '/assets/at-anchor-less-than-100m.mp3',
+  PDV: 'assets/pdv-fog-signal.mp3',
+  SV: 'assets/lame-duck-fog-signal.mp3',
+  VEIF: 'assets/lame-duck-fog-signal.mp3',
+  NUC: 'assets/lame-duck-fog-signal.mp3',
+  RAM: 'assets/lame-duck-fog-signal.mp3',
+  anchorless100m: 'assets/at-anchor-less-than-100m.mp3',
 };
 
 const loaderProm = (modelPath, relposXnm, relposYnm, course, name, type) => {
@@ -148,7 +148,7 @@ function buildThreeDRendering() {
         window.shipsAfloat.slice(1).forEach((ship) => {
           proms.push(
             loaderProm(
-              '/assets/' + ship.type + '.glb',
+              'assets/' + ship.type + '.glb',
               ship.relposXnm,
               ship.relposYnm,
               ship.course,
@@ -162,7 +162,7 @@ function buildThreeDRendering() {
           NC.markers.relPositionsPort.forEach((marker, i) => {
             proms.push(
               buoyLoaderProm(
-                '/assets/portMarker.glb',
+                'assets/portMarker.glb',
                 marker.x,
                 marker.y,
                 `port_marker_${i}`,
@@ -173,7 +173,7 @@ function buildThreeDRendering() {
           NC.markers.relPositionsStarboard.forEach((marker, i) => {
             proms.push(
               buoyLoaderProm(
-                '/assets/stbMarker.glb',
+                'assets/stbMarker.glb',
                 marker.x,
                 marker.y,
                 `starboard_marker_${i}`,
@@ -217,7 +217,7 @@ function buildThreeDRendering() {
       textureWidth: 512,
       textureHeight: 512,
       waterNormals: new THREE.TextureLoader().load(
-        '/assets/waternormals.jpg',
+        'assets/waternormals.jpg',
         function (texture) {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         }

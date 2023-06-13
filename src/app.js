@@ -12,6 +12,17 @@ import * as Calculate from './utils/calculators.js';
 import * as Draw from './drawPaperElements.js';
 import { radToDeg } from 'three/src/math/MathUtils.js';
 import * as RadarControls from './radar/controls.js';
+
+// Listener for data
+window.addEventListener(
+  'message',
+  function (event) {
+    // Do something with event.data, which contains the message sent from the parent
+    window.importedScenario = event.data;
+  },
+  false
+);
+
 // Make the paper scope global, by injecting it into window:
 import('paper').then(({ default: paper }) => {
   paper.install(window);
@@ -216,16 +227,6 @@ import('paper').then(({ default: paper }) => {
     // Load Scenario
     checkData();
 
-    // Record bearings every 0.5 secs. Stop recoding after 10 bearings
-    setInterval(function () {
-      if (shipsAfloat[1].bearings.length < 10) {
-        for (var i = 1; i < shipsAfloat.length; i++) {
-          var ship = shipsAfloat[i];
-          ship.bearings.push(ship.OwnShipAngle);
-        }
-      }
-    }, 500);
-
     // Create deep nested clone of shipsAfloat for record of original scenario
     orgShipsAfloat = cloneDeep(shipsAfloat);
     updateTgtList();
@@ -238,12 +239,6 @@ import('paper').then(({ default: paper }) => {
       $('#type-vis').show();
       $('#type-resvis').hide();
     }
-
-    scenarioStart = Date.now();
-    revealScenario();
-    import('./3dmodv2.js').then((res) => {
-      res.buildThreeDRendering();
-    });
   };
 });
 let params = {
@@ -442,10 +437,16 @@ const updateShips = function (delta) {
 };
 const checkData = function () {
   if (window.importedScenario) {
+    console.log(window.importedScenario);
     importScenario(window.importedScenario);
+    scenarioStart = Date.now();
+    revealScenario();
+    import('./3dmodv2.js').then((res) => {
+      res.buildThreeDRendering();
+    });
+    startBearingChecker();
   } else {
     // Data is not loaded yet, schedule next check
-    console.log("Didn't load");
     window.requestAnimationFrame(checkData);
   }
 };
@@ -605,6 +606,18 @@ const importScenario = function (data) {
     Draw.ship(ship, params.shipVctrLngth, params.onemile);
   });
 };
+
+// Record bearings every 0.5 secs. Stop recoding after 10 bearings
+function startBearingChecker() {
+  setInterval(function () {
+    if (shipsAfloat[1].bearings.length < 10) {
+      for (var i = 1; i < shipsAfloat.length; i++) {
+        var ship = shipsAfloat[i];
+        ship.bearings.push(ship.OwnShipAngle);
+      }
+    }
+  }, 500);
+}
 
 function setupEnvironment() {}
 
