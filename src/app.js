@@ -2,8 +2,6 @@
 import { reqData, APIURL } from './requests.js';
 import cloneDeep from 'lodash/cloneDeep';
 import { mark, unmark } from 'markjs';
-import './report.js';
-import { updateTgtList } from './report.js';
 import './navigation.js';
 import * as TSSHandler from './tss-handler.js';
 import * as NCHandler from './nc-handler.js';
@@ -799,4 +797,4 @@ function updateUSNRFrmOwnshp(ship, ownship) {
   );
 }
 
-export { updateShips, NC, params, shipsAfloat };
+export { updateShips, NC, params };
