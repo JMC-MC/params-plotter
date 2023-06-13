@@ -1,11 +1,3 @@
-import {
-  showTab,
-  startAgain,
-  nextPrev,
-  nextContact,
-  intentions,
-  submitRep,
-} from './report';
 // When document is ready
 $(function () {
   // Radar screen is active on load
@@ -57,25 +49,9 @@ $(function () {
   });
 
   // Report View
-  $('#report-button').on('touchstart mousedown', function () {
-    setActiveMenu(this);
-    $('#myModal').show();
-    showTab();
+  $('#question-button').on('touchstart mousedown', function () {
+    window.postMessage(window.shipsAfloat, '*');
   });
-
-  $('.close').on('touchstart mousedown', function () {
-    $('#myModal').hide();
-  });
-  $('#resetBtn').on('mousedown touchstart', startAgain);
-
-  $('#nextBtn').on('mousedown touchstart', function () {
-    nextPrev(1);
-  });
-  $('#nextCnt').on('mousedown touchstart', nextContact);
-
-  $('#actionBtn').on('mousedown touchstart', intentions);
-
-  $('#submitBtn').on('mousedown touchstart', submitRep);
 
   function setActiveMenu(item) {
     $('.activeclicked').removeClass('activeclicked');

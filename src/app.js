@@ -799,4 +799,4 @@ function updateUSNRFrmOwnshp(ship, ownship) {
   );
 }
 
-export { updateShips, NC, params };
+export { updateShips, NC, params, shipsAfloat };
