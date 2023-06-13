@@ -17,6 +17,7 @@ import * as RadarControls from './radar/controls.js';
 window.addEventListener(
   'message',
   function (event) {
+    console.log(event.data);
     // Do something with event.data, which contains the message sent from the parent
     window.importedScenario = event.data;
   },
