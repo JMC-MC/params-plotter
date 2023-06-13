@@ -2,17 +2,28 @@ const db = require('../db.js');
 const axios = require('axios');
 class View {
   static async generateScenario() {
-    const scenario_context = 'TSS';
-    const scenario_environment = 'day';
-    const traffic_level = 1;
+    const data = {
+      scenario_context: 'TSS',
+      scenario_environment: 'day',
+      traffic_level: '2',
+    };
+
     // const id = '2fbf682a-fb45-4c62-ac79-642d38324b11';
     try {
       // Send a GET request to the external API with the query parameters
-      const response = await axios.get(
-        `http://127.0.0.1:3000?scenario_context=${scenario_context}&scenario_environment=${scenario_environment}&traffic_level=${traffic_level}`
-      );
-      console.log(response.data.message.genShipsAfloat);
-      return response.data.message;
+      const response = await axios({
+        method: 'get',
+        url: 'http://localhost:3000/scenario',
+        data: data,
+      })
+        .then((res) => {
+          console.log(res.data.data.genData);
+          return res.data.data.genData;
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+      return response;
     } catch (err) {
       console.error(err);
       throw new Error('Could not generate scenario');
