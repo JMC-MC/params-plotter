@@ -8,7 +8,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as Convert from './utils/converters.js';
-import { updateShips, NC, params } from './app.js';
+import { updateShips, NC, params, shipsAfloat } from './app.js';
 
 // Declare variables
 let camera, scene, renderer;
@@ -129,7 +129,7 @@ const buoyLoaderProm = (modelPath, relposXnm, relposYnm, name, number) => {
 function buildThreeDRendering() {
   //Rotate camera to own ships head
   // - pi/2 as the orientation for Paper JS is 90 degrees different.
-  camera.rotation.y = -window.shipsAfloat[0].course - Math.PI / 2;
+  camera.rotation.y = -shipsAfloat[0].course - Math.PI / 2;
   $('#base-wrapper').css(
     'transform',
     'rotate(' +
@@ -145,7 +145,7 @@ function buildThreeDRendering() {
       try {
         const proms = [];
         //Loop through shipsAfloat and create a promise for each model loader
-        window.shipsAfloat.slice(1).forEach((ship) => {
+        shipsAfloat.slice(1).forEach((ship) => {
           proms.push(
             loaderProm(
               'assets/' + ship.type + '.glb',
@@ -331,14 +331,10 @@ function buildThreeDRendering() {
 
     $('#course-display').append(
       `<p>${Convert.brngToFourFigStrng(
-        Convert.vecAngleToCompassBrng(
-          window.shipsAfloat[0].vector.angle
-        ).toFixed(1)
+        Convert.vecAngleToCompassBrng(shipsAfloat[0].vector.angle).toFixed(1)
       )}&deg;</p>`
     );
-    $('#speed-display').append(
-      `<p>${window.shipsAfloat[0].speed.toFixed(1)} Kts</p>`
-    );
+    $('#speed-display').append(`<p>${shipsAfloat[0].speed.toFixed(1)} Kts</p>`);
 
     resolve('success');
     reject('Error during intialization');
@@ -393,9 +389,9 @@ function animate() {
             // Defined in nameToIndex function
             let indexNo = nameToIndex(shipName);
             scene.children[i].position.set(
-              convertPos(window.shipsAfloat[indexNo].relposXnm),
+              convertPos(shipsAfloat[indexNo].relposXnm),
               0,
-              convertPos(window.shipsAfloat[indexNo].relposYnm)
+              convertPos(shipsAfloat[indexNo].relposYnm)
             );
 
             // If dark control directional lights
@@ -473,13 +469,13 @@ function animate() {
 
 // If ship over 11nm away make invisible
 function overHorizon(indexNo, shipObject) {
-  if (window.shipsAfloat[indexNo].range > 11) shipObject.visible = false;
+  if (shipsAfloat[indexNo].range > 11) shipObject.visible = false;
   else shipObject.visible = true;
 }
 
 // Turn directional lights on/off;
 function dLights(indexNo, shipObject) {
-  const shipUSN = window.shipsAfloat[indexNo].USNRel;
+  const shipUSN = shipsAfloat[indexNo].USNRel;
   shipObject.traverse((el) => {
     // Starboard side light
     if (
@@ -517,7 +513,7 @@ function dLights(indexNo, shipObject) {
 
 // ShipsAfloat and Scene do not have the ships in the same order. Therefore match name to index.
 function nameToIndex(shipName) {
-  return window.shipsAfloat.findIndex(function checkName(array) {
+  return shipsAfloat.findIndex(function checkName(array) {
     return array.name == shipName;
   });
 }
@@ -815,7 +811,7 @@ const bearingLogger = function (clickedCompass) {
   const dwellTime = currentTime - timeAtLastClick;
 
   // Check if bearing has been taken
-  window.shipsAfloat.slice(1).forEach((ship) => {
+  shipsAfloat.slice(1).forEach((ship) => {
     // Get absolute difference between currentBearing and ship bearing
     const bearingDiff = Math.abs(
       Convert.vecAngleToCompassBrng(Math.round(ship.vecOwnShip.angle)) -

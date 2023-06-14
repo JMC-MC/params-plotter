@@ -247,8 +247,8 @@ let params = {
 // Array for ships on canvas
 // Original ships, used on reset
 let orgShipsAfloat = [];
-// ships that are updated when moved.
-window.shipsAfloat = [];
+// Object containing all ships and their properties
+let shipsAfloat = [];
 // Start time
 let scenarioStart = '';
 // TSS
@@ -796,4 +796,4 @@ function updateUSNRFrmOwnshp(ship, ownship) {
   );
 }
 
-export { updateShips, NC, params };
+export { updateShips, NC, params, shipsAfloat };
