@@ -228,7 +228,6 @@ import('paper').then(({ default: paper }) => {
 
     // Create deep nested clone of shipsAfloat for record of original scenario
     orgShipsAfloat = cloneDeep(shipsAfloat);
-    updateTgtList();
 
     // Change form if in restricted visibility mode
     if (params.resVis) {
