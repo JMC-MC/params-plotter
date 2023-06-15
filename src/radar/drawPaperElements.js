@@ -1,6 +1,6 @@
-import * as Convert from './utils/converters.js';
-import * as Calculate from './utils/calculators.js';
-import { shipsAfloat } from './app.js';
+import * as Convert from '../utils/converters.js';
+import * as Calculate from '../utils/calculators.js';
+import { shipsAfloat } from '../app.js';
 
 export function radarRings(project, centX, centY, onemile) {
   project.activeLayer.removeChildren();
@@ -26,7 +26,7 @@ export function radarRings(project, centX, centY, onemile) {
   rangeRings.strokeColor = '#282828';
 }
 
-export function narrowChannel(NC, onemile) {
+export function narrowChannel(NC, onemile, centX, centY) {
   NC.paths = new Group();
   let channelMarkers = new Group();
 

@@ -7,7 +7,7 @@ import * as TSSHandler from './tss-handler.js';
 import * as NCHandler from './nc-handler.js';
 import * as Convert from './utils/converters.js';
 import * as Calculate from './utils/calculators.js';
-import * as Draw from './drawPaperElements.js';
+import * as Draw from './radar/drawPaperElements.js';
 import { radToDeg } from 'three/src/math/MathUtils.js';
 import * as RadarControls from './radar/controls.js';
 
@@ -135,7 +135,7 @@ import('paper').then(({ default: paper }) => {
           NC.lanes.occupied.position.add(event.delta.divide(2)),
           NC
         );
-        Draw.narrowChannel(NC, params.onemile);
+        Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
       }
       for (var i = 0; i < shipsAfloat.length; i++) {
         var ship = shipsAfloat[i];
@@ -276,7 +276,7 @@ function upDateScale(direction) {
         new Point(params.centX, params.centY),
         params.onemile
       );
-      Draw.narrowChannel(NC, params.onemile);
+      Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
     }
 
     // Loop through every ship
@@ -311,7 +311,7 @@ function upDateScale(direction) {
         new Point(params.centX, params.centY),
         params.onemile
       );
-      Draw.narrowChannel(NC, params.onemile);
+      Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
     }
     // Loop through every ship
     for (var i = 0; i < shipsAfloat.length; i++) {
@@ -393,7 +393,7 @@ const updateShips = function (delta) {
         shipsAfloat[0].position,
         params.onemile
       );
-      Draw.narrowChannel(NC, params.onemile);
+      Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
     }
     Draw.ship(shipsAfloat[0], params.shipVctrLngth, params.onemile);
     for (var i = 0; i < shipsAfloat.length; i++) {
@@ -597,7 +597,7 @@ const importScenario = function (data) {
 
     // Add to Narrow Channel variable;
     NC = data.NC;
-    Draw.narrowChannel(NC, params.onemile);
+    Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
   }
   shipsAfloat = data.genShipsAfloat;
   shipsAfloat.forEach((ship) => {

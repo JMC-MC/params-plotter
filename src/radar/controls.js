@@ -53,6 +53,7 @@ export function init(scale, shipVctrLngth) {
   $('.title').click(function () {
     // Only for use on medium and large screens
     if ($(window).width() > 601) {
+      console.log($(this));
       $(this).parent().find('.arrow').toggleClass('arrow-animate');
       $(this).parent().find('.accordion').slideToggle(280);
     }
