@@ -7,15 +7,18 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import * as Convert from './utils/converters.js';
-import { updateShips, NC, params, shipsAfloat } from './app.js';
+import * as Convert from '../utils/converters.js';
+import { updateShips, NC, params, shipsAfloat } from '../app.js';
+import * as Ran from '../utils/radomizers.js';
 
 // Declare variables
 let camera, scene, renderer;
 let water, sun;
 let bloomPass, bloomComposer, finalComposer, finalPass;
 const parameters = {
-  elevation: -10,
+  sunriseElevation: 2,
+  sunsetElevation: 178,
+  elevation: null,
   azimuth: 90,
 };
 const fps = 30;
@@ -28,6 +31,7 @@ buoys.name = 'buoys';
 let dark;
 const buoyFlashInterval = 1000; // Milliseconds
 const buoyFlashLength = 1000; // Milliseconds
+
 // Declare variable for controls
 let zoomed = false;
 let turnRate = 0;
@@ -54,6 +58,26 @@ const audioLoader = new THREE.AudioLoader();
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
+// Setup elevation from environment variable
+switch (params.environment) {
+  case 'day':
+    parameters.elevation = Ran.IntFromInterval(
+      parameters.sunriseElevation,
+      parameters.sunsetElevation
+    );
+    console.log(parameters.elevation);
+    dark = false;
+    break;
+  case 'night':
+    parameters.elevation = Ran.IntFromInterval(
+      parameters.sunriseElevation,
+      -parameters.sunsetElevation
+    );
+    console.log(parameters.elevation);
+    dark = true;
+    break;
+}
+
 //Make each loader a promise
 var loader = new GLTFLoader();
 
@@ -78,7 +102,7 @@ const loaderProm = (modelPath, relposXnm, relposYnm, course, name, type) => {
         // Three JS rotates anti-clockwise, subtract angles from Paper JS
         model.rotation.y = -course;
         model.name = name;
-        if (params.resVis) {
+        if (params.environment === 'resVis') {
           // Add audio
           audioLoader.load(getAudioPath(type), function (buffer) {
             const audio = new THREE.PositionalAudio(listener);
@@ -136,8 +160,6 @@ function buildThreeDRendering() {
       Math.round((shipsAfloat[0].course * 180) / Math.PI + 90) +
       'deg)'
   );
-
-  parameters.elevation = params.elevation;
 
   // Start async loading models as soon as page loads
   const totalLoader = new Promise((resolve, reject) => {
@@ -250,7 +272,7 @@ function buildThreeDRendering() {
     let renderTarget;
 
     //Fog
-    if (params.resVis) {
+    if (params.environment === 'resVis') {
       skyUniforms['mieCoefficient'].value = 0.8;
       skyUniforms['mieDirectionalG'].value = 0.5;
       scene.fog = new THREE.Fog(0x484849, 1000, 1100);
@@ -346,12 +368,8 @@ function buildThreeDRendering() {
   (async () => {
     try {
       await Promise.all([totalLoader, init]);
-      // Set dark variable
-      if (parameters.elevation > 2 && parameters.elevation < 178) dark = false;
-      else {
-        dark = true;
-        shipLightControl(dark);
-      }
+
+      shipLightControl(dark);
 
       animate();
       $('.threeOverlay').hide();

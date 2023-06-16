@@ -1,10 +1,9 @@
 // Import own modules
-import { reqData, APIURL } from './requests.js';
 import cloneDeep from 'lodash/cloneDeep';
 import { mark, unmark } from 'markjs';
 import './navigation.js';
-import * as TSSHandler from './tss-handler.js';
-import * as NCHandler from './nc-handler.js';
+import * as TSSHandler from './utils/tss-handler.js';
+import * as NCHandler from './utils/nc-handler.js';
 import * as Convert from './utils/converters.js';
 import * as Calculate from './utils/calculators.js';
 import * as Draw from './radar/drawPaperElements.js';
@@ -33,16 +32,12 @@ import('paper').then(({ default: paper }) => {
     var tool = new Tool();
     // Parameters
     params.resVis = false;
-    params.elevation = null;
     params.play = true;
     params.scale = 12;
     params.centX = myCanvas.getBoundingClientRect().width / 2;
     params.centY = myCanvas.getBoundingClientRect().height / 2;
 
     RadarControls.init();
-
-    $('#range-scale, #range-scale-sec').text(params.scale);
-
     //Get shortest dimension
     function getScale() {
       if (
@@ -57,63 +52,6 @@ import('paper').then(({ default: paper }) => {
       // This creates a 12nm range scale
       params.onemile = shortDim / (params.scale * 2);
     }
-
-    // Adjust range/vectors function
-    $('#minus-range, #minus-range-sec').click(function () {
-      // Confirm request is within limits
-      if (params.scale > 1.5) {
-        // change scale and update number on info panel
-        params.scale = params.scale / 2;
-        $('#range-scale, #range-scale-sec').text(params.scale);
-        // Call function to update canvas
-        const direction = 'minus';
-        upDateScale(direction);
-      }
-    });
-
-    $('#plus-range, #plus-range-sec').click(function () {
-      // Confirm request is within limits
-      if (params.scale < 48) {
-        // change scale and update number on info panel
-        params.scale = params.scale * 2;
-        $('#range-scale, #range-scale-sec').text(params.scale);
-        // Call function to update canvas
-        const direction = 'plus';
-        upDateScale(direction);
-      }
-    });
-
-    $('#minus-vec, #minus-vec-sec').click(function () {
-      // Confirm request is within limits
-      if (params.shipVctrLngth > 3) {
-        // Call function to update canvas
-        const direction = 'minus';
-        updateVecLen(direction);
-        $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
-      }
-    });
-
-    $('#plus-vec, #plus-vec-sec').click(function () {
-      // Confirm request is within limits
-      if (params.shipVctrLngth < 48) {
-        // Call function to update canvas
-        const direction = 'plus';
-        updateVecLen(direction);
-        $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
-      }
-    });
-
-    // Accordion info panels
-    //Toggle on load
-    $('#ship').parent().find('.arrow').toggleClass('arrow-animate');
-
-    $('.title').click(function () {
-      // Only for use on medium and large screens
-      if ($(window).width() > 601) {
-        $(this).parent().find('.arrow').toggleClass('arrow-animate');
-        $(this).parent().find('.accordion').slideToggle(280);
-      }
-    });
 
     //Config Canvas
     // When browser is resized keep ownship in centre and other ships in same relative position
@@ -257,81 +195,81 @@ let TSS = null;
 let NC = null;
 
 // Display scale
-function upDateScale(direction) {
-  //Move ships on screen to reflect new scale
-  // If reducing range scale
-  if (direction == 'minus') {
-    params.onemile += params.onemile;
+// function upDateScale(direction) {
+//   //Move ships on screen to reflect new scale
+//   // If reducing range scale
+//   if (direction == 'minus') {
+//     params.onemile += params.onemile;
 
-    Draw.radarRings(project, params.centX, params.centY, params.onemile);
-    if (TSS) {
-      TSSHandler.updateScale(TSS, shipsAfloat, direction);
-      Draw.TSS(TSS);
-    }
-    if (NC) {
-      NCHandler.updateScale(
-        NC,
-        shipsAfloat,
-        direction,
-        new Point(params.centX, params.centY),
-        params.onemile
-      );
-      Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
-    }
+//     Draw.radarRings(project, params.centX, params.centY, params.onemile);
+//     if (TSS) {
+//       TSSHandler.updateScale(TSS, shipsAfloat, direction);
+//       Draw.TSS(TSS);
+//     }
+//     if (NC) {
+//       NCHandler.updateScale(
+//         NC,
+//         shipsAfloat,
+//         direction,
+//         new Point(params.centX, params.centY),
+//         params.onemile
+//       );
+//       Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
+//     }
 
-    // Loop through every ship
-    for (var i = 0; i < shipsAfloat.length; i++) {
-      var ship = shipsAfloat[i];
-      if (ship.type != 'Own Ship') {
-        // Get vector to ownShip/centre
-        const vecOwnShip = ship.position.subtract(shipsAfloat[0].position);
-        ship.position = ship.position.add(vecOwnShip);
-        ship.vecEnd = ship.vecEnd.add(vecOwnShip);
-        ship.vecEnd = ship.vecEnd.add(ship.vector);
-      }
-      if (ship.type == 'Own Ship') {
-        // Increase vector size by 2
-        ship.vecEnd = ship.vecEnd.add(ship.vector);
-      }
-      Calculate.CPA(ship, shipsAfloat[0], params.shipVctrLngth, params.onemile);
-      Draw.ship(ship, params.shipVctrLngth, params.onemile);
-    }
-  } else {
-    params.onemile = params.onemile / 2;
-    Draw.radarRings(project, params.centX, params.centY, params.onemile);
-    if (TSS) {
-      TSSHandler.updateScale(TSS, shipsAfloat, direction);
-      Draw.TSS(TSS);
-    }
-    if (NC) {
-      NCHandler.updateScale(
-        NC,
-        shipsAfloat,
-        direction,
-        new Point(params.centX, params.centY),
-        params.onemile
-      );
-      Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
-    }
-    // Loop through every ship
-    for (var i = 0; i < shipsAfloat.length; i++) {
-      var ship = shipsAfloat[i];
-      if (ship.type != 'Own Ship') {
-        // Get vector to ownShip/centre
-        const vecOwnShip = ship.position.subtract(shipsAfloat[0].position);
-        ship.position = ship.position.subtract(vecOwnShip.divide(2));
-        ship.vecEnd = ship.vecEnd.subtract(vecOwnShip.divide(2));
-        ship.vecEnd = ship.vecEnd.subtract(ship.vector.divide(2));
-      }
-      if (ship.type == 'Own Ship') {
-        // Half vector size.
-        ship.vecEnd = ship.vecEnd.subtract(ship.vector.divide(2));
-      }
-      Calculate.CPA(ship, shipsAfloat[0], params.shipVctrLngth, params.onemile);
-      Draw.ship(ship, params.shipVctrLngth, params.onemile);
-    }
-  }
-}
+//     // Loop through every ship
+//     for (var i = 0; i < shipsAfloat.length; i++) {
+//       var ship = shipsAfloat[i];
+//       if (ship.type != 'Own Ship') {
+//         // Get vector to ownShip/centre
+//         const vecOwnShip = ship.position.subtract(shipsAfloat[0].position);
+//         ship.position = ship.position.add(vecOwnShip);
+//         ship.vecEnd = ship.vecEnd.add(vecOwnShip);
+//         ship.vecEnd = ship.vecEnd.add(ship.vector);
+//       }
+//       if (ship.type == 'Own Ship') {
+//         // Increase vector size by 2
+//         ship.vecEnd = ship.vecEnd.add(ship.vector);
+//       }
+//       Calculate.CPA(ship, shipsAfloat[0], params.shipVctrLngth, params.onemile);
+//       Draw.ship(ship, params.shipVctrLngth, params.onemile);
+//     }
+//   } else {
+//     params.onemile = params.onemile / 2;
+//     Draw.radarRings(project, params.centX, params.centY, params.onemile);
+//     if (TSS) {
+//       TSSHandler.updateScale(TSS, shipsAfloat, direction);
+//       Draw.TSS(TSS);
+//     }
+//     if (NC) {
+//       NCHandler.updateScale(
+//         NC,
+//         shipsAfloat,
+//         direction,
+//         new Point(params.centX, params.centY),
+//         params.onemile
+//       );
+//       Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
+//     }
+//     // Loop through every ship
+//     for (var i = 0; i < shipsAfloat.length; i++) {
+//       var ship = shipsAfloat[i];
+//       if (ship.type != 'Own Ship') {
+//         // Get vector to ownShip/centre
+//         const vecOwnShip = ship.position.subtract(shipsAfloat[0].position);
+//         ship.position = ship.position.subtract(vecOwnShip.divide(2));
+//         ship.vecEnd = ship.vecEnd.subtract(vecOwnShip.divide(2));
+//         ship.vecEnd = ship.vecEnd.subtract(ship.vector.divide(2));
+//       }
+//       if (ship.type == 'Own Ship') {
+//         // Half vector size.
+//         ship.vecEnd = ship.vecEnd.subtract(ship.vector.divide(2));
+//       }
+//       Calculate.CPA(ship, shipsAfloat[0], params.shipVctrLngth, params.onemile);
+//       Draw.ship(ship, params.shipVctrLngth, params.onemile);
+//     }
+//   }
+// }
 
 // Vector settings
 // Vector Length
@@ -439,7 +377,7 @@ const checkData = function () {
     importScenario(window.importedScenario);
     scenarioStart = Date.now();
     revealScenario();
-    import('./3dmodv2.js').then((res) => {
+    import('./lookout/3dmodv2.js').then((res) => {
       res.buildThreeDRendering();
     });
     startBearingChecker();
@@ -451,9 +389,7 @@ const checkData = function () {
 
 // Import and process generated Scenario
 const importScenario = function (data) {
-  setupEnvironment(data);
-  params.elevation = -10; // TODO: Get elevation from data
-  params.resVis = data.resVis;
+  params.environment = data.env;
   // Find vector from gen centre to screen center
   const screenCenter = new Point(params.centX, params.centY);
   // Intialise paperjs point
@@ -616,8 +552,6 @@ function startBearingChecker() {
     }
   }, 500);
 }
-
-function setupEnvironment() {}
 
 // function drawTSS(TSS) {
 
@@ -796,4 +730,4 @@ function updateUSNRFrmOwnshp(ship, ownship) {
   );
 }
 
-export { updateShips, NC, params, shipsAfloat };
+export { updateShips, TSS, NC, params, shipsAfloat };

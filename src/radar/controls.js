@@ -1,48 +1,51 @@
-export function init(scale, shipVctrLngth) {
-  $('#range-scale, #range-scale-sec').text(scale);
+import { TSS, NC, params, shipsAfloat } from '../app.js';
+import * as Update from './updaters.js';
+
+export function init() {
+  $('#range-scale, #range-scale-sec').text(params.scale);
 
   // Adjust range/vectors function
   $('#minus-range, #minus-range-sec').click(function () {
     // Confirm request is within limits
-    if (scale > 1.5) {
+    if (params.scale > 1.5) {
       // change scale and update number on info panel
-      scale = scale / 2;
-      $('#range-scale, #range-scale-sec').text(scale);
+      params.scale = params.scale / 2;
+      $('#range-scale, #range-scale-sec').text(params.scale);
       // Call function to update canvas
       const direction = 'minus';
-      upDateScale(direction);
+      Update.scale(direction, params, shipsAfloat, TSS, NC);
     }
   });
 
   $('#plus-range, #plus-range-sec').click(function () {
     // Confirm request is within limits
-    if (scale < 48) {
-      // change scale and update number on info panel
-      scale = scale * 2;
-      $('#range-scale, #range-scale-sec').text(scale);
+    if (params.scale < 48) {
+      // change params.scale and update number on info panel
+      params.scale = params.scale * 2;
+      $('#range-scale, #range-scale-sec').text(params.scale);
       // Call function to update canvas
       const direction = 'plus';
-      upDateScale(direction);
+      Update.scale(direction, params, shipsAfloat, TSS, NC);
     }
   });
 
   $('#minus-vec, #minus-vec-sec').click(function () {
     // Confirm request is within limits
-    if (shipVctrLngth > 3) {
+    if (params.shipVctrLngth > 3) {
       // Call function to update canvas
       const direction = 'minus';
       updateVecLen(direction);
-      $('#vec-length, #vec-length-sec').text(shipVctrLngth);
+      $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
     }
   });
 
   $('#plus-vec, #plus-vec-sec').click(function () {
     // Confirm request is within limits
-    if (shipVctrLngth < 48) {
+    if (params.shipVctrLngth < 48) {
       // Call function to update canvas
       const direction = 'plus';
       updateVecLen(direction);
-      $('#vec-length, #vec-length-sec').text(shipVctrLngth);
+      $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
     }
   });
 
@@ -53,7 +56,6 @@ export function init(scale, shipVctrLngth) {
   $('.title').click(function () {
     // Only for use on medium and large screens
     if ($(window).width() > 601) {
-      console.log($(this));
       $(this).parent().find('.arrow').toggleClass('arrow-animate');
       $(this).parent().find('.accordion').slideToggle(280);
     }

@@ -1,5 +1,5 @@
 import { getRectangleCorners } from './tss-handler.js';
-import * as Convert from './utils/converters.js';
+import * as Convert from './converters.js';
 
 // Functions for handling the NC object.
 export const updatePositionsDelta = function (moveVector, NCObject) {
