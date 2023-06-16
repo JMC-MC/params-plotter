@@ -9,7 +9,7 @@ import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as Convert from '../utils/converters.js';
 import { updateShips, NC, params, shipsAfloat } from '../app.js';
-import * as Ran from '../utils/radomizers.js';
+import * as Ran from '../utils/randomizers.js';
 
 // Declare variables
 let camera, scene, renderer;
