@@ -1,0 +1,40 @@
+#Intialize
+    Radar
+        load Paper
+        attach to canvas
+        create tools
+        initialize controllers
+    Lookout
+        load Three
+        declare variables and functions    
+
+#Load Scenario
+    Game Controller
+        load ships
+        load features
+        set parameters
+        draw scenario
+        start animation
+    Radar
+        draw scenario
+    Lookout
+        load models
+        load enviroment 
+        set daylight
+        set fog
+        build rendering
+        start animation
+
+#Reset scenario
+    Loader
+        display until loading complete
+    Game Controller
+        clear Ships
+        clear features
+        Reset params
+        reset animation
+    Radar
+        clear canvas elements
+    Lookout
+        Clear scene
+        Reset parameters

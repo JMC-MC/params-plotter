@@ -34,7 +34,7 @@ export function init() {
     if (params.shipVctrLngth > 3) {
       // Call function to update canvas
       const direction = 'minus';
-      updateVecLen(direction);
+      Update.vecLen(direction, params, shipsAfloat);
       $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
     }
   });
@@ -44,7 +44,7 @@ export function init() {
     if (params.shipVctrLngth < 48) {
       // Call function to update canvas
       const direction = 'plus';
-      updateVecLen(direction);
+      Update.vecLen(direction, params, shipsAfloat);
       $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
     }
   });
@@ -60,4 +60,26 @@ export function init() {
       $(this).parent().find('.accordion').slideToggle(280);
     }
   });
+}
+
+//Clear selected in all ships
+export function clearSelectedShip() {
+  for (var i = 0; i < shipsAfloat.length; i++) {
+    shipsAfloat[i].posSelected = false;
+    shipsAfloat[i].vecSelected = false;
+  }
+}
+
+//Clear target selected in all ships
+export function clearTargetSelected() {
+  for (var i = 0; i < shipsAfloat.length; i++) {
+    shipsAfloat[i].targetSelected = false;
+  }
+}
+
+//Clear edit selected in all ships
+export function clearEditSelected() {
+  for (var i = 0; i < shipsAfloat.length; i++) {
+    shipsAfloat[i].editSelected = false;
+  }
 }

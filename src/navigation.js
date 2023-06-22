@@ -50,7 +50,7 @@ $(function () {
 
   // Report View
   $('#question-button').on('touchstart mousedown', function () {
-    window.postMessage(window.shipsAfloat, '*');
+    window.parent.postMessage(window.shipsAfloat, '*');
   });
 
   function setActiveMenu(item) {

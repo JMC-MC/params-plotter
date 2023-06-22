@@ -78,3 +78,27 @@ export function scale(direction, params, shipsAfloat, TSS, NC) {
     }
   }
 }
+
+export function vecLen(direction, params, shipsAfloat) {
+  if (direction == 'minus') {
+    params.shipVctrLngth = params.shipVctrLngth - params.shipVctrLngth / 2;
+    // Loop through every ship
+    for (var i = 0; i < shipsAfloat.length; i++) {
+      var ship = shipsAfloat[i];
+      // Adjust Vec End
+      ship.vecEnd = ship.vecEnd.subtract(ship.vector.divide(2));
+      Calculate.CPA(ship, shipsAfloat[0], params.shipVctrLngth, params.onemile);
+      Draw.ship(ship, params.shipVctrLngth, params.onemile);
+    }
+  } else {
+    params.shipVctrLngth = params.shipVctrLngth + params.shipVctrLngth;
+    // Loop through every ship
+    for (var i = 0; i < shipsAfloat.length; i++) {
+      var ship = shipsAfloat[i];
+      // Adjust Vec End
+      ship.vecEnd = ship.vecEnd.add(ship.vector);
+      Calculate.CPA(ship, shipsAfloat[0], params.shipVctrLngth, params.onemile);
+      Draw.ship(ship, params.shipVctrLngth, params.onemile);
+    }
+  }
+}

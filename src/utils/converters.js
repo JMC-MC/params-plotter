@@ -25,3 +25,9 @@ export function brngToFourFigStrng(bearing) {
     return BrngAsString;
   }
 }
+
+export function distanceToThreeCanvas(pos) {
+  //Scale 12NM = 12000M
+  var b = pos * 1000;
+  return b;
+}
