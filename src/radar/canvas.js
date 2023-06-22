@@ -118,8 +118,15 @@ export function init() {
   Draw.radarRings(project, params.centX, params.centY, params.onemile);
 }
 
+export function reset() {
+  params.centX = myCanvas.getBoundingClientRect().width / 2;
+  params.centY = myCanvas.getBoundingClientRect().height / 2;
+  getScale(myCanvas);
+  Draw.radarRings(project, params.centX, params.centY, params.onemile);
+}
+
 // Function to clear the canvas
-export function clearCanvas() {
+export function clear() {
   // Remove all items from the project
   project.activeLayer.removeChildren();
 }

@@ -2,7 +2,7 @@ import { TSS, NC, params, shipsAfloat } from '../app.js';
 import * as Update from './updaters.js';
 
 export function init() {
-  $('#range-scale, #range-scale-sec').text(params.scale);
+  updateScaleValue();
 
   // Adjust range/vectors function
   $('#minus-range, #minus-range-sec').click(function () {
@@ -10,7 +10,7 @@ export function init() {
     if (params.scale > 1.5) {
       // change scale and update number on info panel
       params.scale = params.scale / 2;
-      $('#range-scale, #range-scale-sec').text(params.scale);
+      updateScaleValue();
       // Call function to update canvas
       const direction = 'minus';
       Update.scale(direction, params, shipsAfloat, TSS, NC);
@@ -22,7 +22,7 @@ export function init() {
     if (params.scale < 48) {
       // change params.scale and update number on info panel
       params.scale = params.scale * 2;
-      $('#range-scale, #range-scale-sec').text(params.scale);
+      updateScaleValue();
       // Call function to update canvas
       const direction = 'plus';
       Update.scale(direction, params, shipsAfloat, TSS, NC);
@@ -35,7 +35,7 @@ export function init() {
       // Call function to update canvas
       const direction = 'minus';
       Update.vecLen(direction, params, shipsAfloat);
-      $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
+      updateVecLengthValue();
     }
   });
 
@@ -45,7 +45,7 @@ export function init() {
       // Call function to update canvas
       const direction = 'plus';
       Update.vecLen(direction, params, shipsAfloat);
-      $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
+      updateVecLengthValue();
     }
   });
 
@@ -60,6 +60,13 @@ export function init() {
       $(this).parent().find('.accordion').slideToggle(280);
     }
   });
+}
+
+export function updateScaleValue() {
+  $('#range-scale, #range-scale-sec').text(params.scale);
+}
+export function updateVecLengthValue() {
+  $('#vec-length, #vec-length-sec').text(params.shipVctrLngth);
 }
 
 //Clear selected in all ships

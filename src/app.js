@@ -224,11 +224,20 @@ const resetScenarioViewer = function () {
   //Reset Scenario Data
   TSS = null;
   NC = null;
-  orgShipsAfloat = [];
-  shipsAfloat = [];
+  orgShipsAfloat = null;
+  shipsAfloat = null;
   scenarioStart = null;
+  // Reset params object
+  params.shipVctrLngth = 6;
+  params.onemile = 0;
+  params.resVis = false;
+  params.play = true;
+  params.scale = 12;
   //Reset Radar
-  PprCanvas.clearCanvas();
+  PprCanvas.clear();
+  PprCanvas.reset();
+  RadarControls.updateScaleValue();
+  RadarControls.updateVecLengthValue();
   //Reset Lookout
   clearScene();
 };
