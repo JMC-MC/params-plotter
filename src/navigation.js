@@ -1,10 +1,13 @@
+import { reDrawRadar, clear } from './radar/canvas';
 // When document is ready
+
 $(function () {
   // Radar screen is active on load
   $('#radar-button').addClass('activeclicked'); // Make radar-button active on page load
 
   // Navigation
   $('#lookout-button').on('touchstart mousedown', function () {
+    // clear();
     setActiveMenu(this);
     // Switch Screens
     $('#radar').hide();
@@ -21,10 +24,14 @@ $(function () {
     $('#rules-view').hide();
     $('#report-view').hide();
     $('#staff-answer').hide();
-
-    setTimeout(() => {
+    setTimeout(function () {
+      let myCanvas = document.getElementById('myCanvas');
+      view.viewSize = new paper.Size(
+        myCanvas.getBoundingClientRect().width,
+        myCanvas.getBoundingClientRect().height
+      );
       window.dispatchEvent(new CustomEvent('resize'));
-    }, 100);
+    }, 1000);
   });
 
   $('#rules-button').on('touchstart mousedown', function () {
