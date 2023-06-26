@@ -31,6 +31,7 @@ let params = {
   resVis: false,
   play: true,
   scale: 12,
+  animatePaperCanvas: null,
 };
 
 // Listener for data

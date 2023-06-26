@@ -1,0 +1,65 @@
+.rules-text li {
+  list-style-type: none;
+}
+.rules-text mark {
+  background: yellow;
+}
+
+.rules-text mark.current {
+  background: orange;
+}
+
+.header {
+  padding: 15px;
+  width: 100%;
+  background: #292929;
+  color: #fefefe;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.rules-text {
+  margin: 0px 42px;
+  margin-top: 90px;
+  padding-bottom: 130px;
+}
+
+button {
+  border-radius: 3px;
+}
+
+#rules-view {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+#rules-view ul {
+  padding-left: 13px;
+}
+
+#rules-view ul li {
+  margin: 9px 0;
+  line-height: 1.64rem;
+}
+
+#rules-view .header .header-container {
+  display: flex;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+#rules-view .header input[type='search'] {
+  flex: 1 1 auto;
+  background-color: azure;
+  border: 1px solid darkgray;
+}
+
+#rules-view .header button {
+  margin-left: 3px;
+  padding: 3px 13px;
+}
+
+#rules-view .header button.remove-search {
+  background-color: #bd4c62;
+}

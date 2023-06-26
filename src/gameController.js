@@ -6,8 +6,7 @@ import * as Convert from './utils/converters.js';
 
 export function updateShips(delta, params, shipsAfloat, TSS, NC) {
   const deltaSecs = delta / 1000;
-  if (params.play == true) {
-    Draw.radarRings(project, params.centX, params.centY, params.onemile);
+  if (params.play) {
     // Update TSS
     if (TSS) {
       const OSvecInSec = shipsAfloat[0].vector.length * 60;
@@ -16,7 +15,6 @@ export function updateShips(delta, params, shipsAfloat, TSS, NC) {
       moveVector.angle = shipsAfloat[0].vector.angle - 180;
       const newPosition = TSS.trafficLanes.occupied.position.add(moveVector);
       TSSHandler.updatePositionOccupied(newPosition, TSS);
-      Draw.TSS(TSS);
     }
     // Update Narrow Channel
     if (NC) {
@@ -36,9 +34,7 @@ export function updateShips(delta, params, shipsAfloat, TSS, NC) {
         shipsAfloat[0].position,
         params.onemile
       );
-      Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
     }
-    Draw.ship(shipsAfloat[0], params.shipVctrLngth, params.onemile);
     for (var i = 0; i < shipsAfloat.length; i++) {
       var ship = shipsAfloat[i];
       if (ship.type != 'Own Ship') {
@@ -70,8 +66,15 @@ export function updateShips(delta, params, shipsAfloat, TSS, NC) {
           params.shipVctrLngth,
           params.onemile
         );
-        if ($('#radar').is(':visible'))
+        Draw.radarRings(project, params.centX, params.centY, params.onemile);
+        if (TSS) Draw.TSS(TSS);
+        if (NC)
+          Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
+        Draw.ship(shipsAfloat[0], params.shipVctrLngth, params.onemile);
+        for (var i = 1; i < shipsAfloat.length; i++) {
+          var ship = shipsAfloat[i];
           Draw.ship(ship, params.shipVctrLngth, params.onemile);
+        }
       }
     }
   }

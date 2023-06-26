@@ -1,0 +1,258 @@
+#inst-view-container {
+  transform: scale(0.7);
+  transform-origin: center top;
+}
+
+#inst-view-container #view-selector {
+  transform: scale(1.3);
+  transform-origin: center top;
+}
+
+@media (min-width: 601px) {
+  #inst-view-container {
+    transform: scale(1);
+  }
+
+  #inst-view-container #view-selector {
+    transform: scale(1);
+  }
+}
+
+#right-arrow,
+#left-arrow,
+#view-selector .viewbtn {
+  cursor: pointer;
+}
+
+#fcsBrng {
+  font-size: 1.5em;
+  border: #d8d8d8 0.75px solid;
+  border-bottom: #2c2c2c 3px inset;
+  padding: 5px;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+#right-arrow {
+  color: rgba(255, 255, 255, 0.7);
+  position: fixed;
+  right: 5px;
+  bottom: 50%;
+  font-size: 6em;
+  z-index: 6;
+}
+
+#left-arrow {
+  color: rgba(255, 255, 255, 0.7);
+  position: fixed;
+  left: 5px;
+  bottom: 50%;
+  font-size: 6em;
+  z-index: 5;
+}
+
+.compass {
+  width: 100%;
+  font-size: 1em;
+  background-color: #e1e1d5;
+  opacity: 1;
+  color: rgb(0, 0, 0);
+  padding: 2.5px;
+  box-shadow: 0 7px 14px 1px rgb(43, 43, 43) inset;
+  border: #1d1d1d 2px;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+}
+
+.lookoutInfo {
+  height: fit-content;
+  width: 190px;
+  height: 127px;
+  position: absolute;
+  bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  border-radius: 30%;
+}
+
+#orientator {
+  margin: 0;
+  transform: rotate(0deg);
+  z-index: 2;
+}
+
+.circle {
+  height: 70px;
+  width: 70px;
+  background-color: none;
+  opacity: 0.5;
+  border-radius: 50%;
+  border: #ffffff 1px solid;
+  display: inline-block;
+}
+
+#cone {
+  position: relative;
+  top: 35px;
+  left: 4px;
+  width: 0;
+  height: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-top: 35px solid rgb(255, 255, 255);
+  opacity: 0.5;
+  border-radius: 50%;
+}
+#base-wrapper {
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  margin: 16px;
+  transform: rotate(0deg);
+  z-index: 1;
+  height: 70px;
+  width: 70px;
+  background-color: none;
+  opacity: 0.5;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+#base {
+  background: rgb(178, 2, 2);
+  top: 24px;
+  left: 26px;
+  display: inline-block;
+  height: 30px;
+  position: relative;
+  width: 15px;
+  z-index: 1;
+}
+#base:before {
+  border-bottom: 10px solid rgb(178, 2, 2);
+  border-left: 7.5px solid transparent;
+  border-right: 7.5px solid transparent;
+  content: '';
+  height: 0;
+  left: 0;
+  position: absolute;
+  top: -10px;
+  width: 0;
+  z-index: 1;
+}
+
+#polaris {
+  background-color: none;
+  border: rgb(28, 28, 28) solid 30px;
+  border-top: rgb(28, 28, 28) solid 20px;
+  width: 165px;
+  height: 60%;
+  position: absolute;
+  bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  border-radius: 10px;
+  z-index: 4;
+}
+
+.line {
+  position: absolute;
+  height: 60%;
+  bottom: 0;
+  left: 50%;
+  right: 0;
+  border-left: 0.75px solid rgb(28, 28, 28);
+  z-index: 3;
+}
+
+#inst-view-container {
+  position: absolute;
+  top: 0;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  width: fit-content;
+}
+
+#instrument-panel {
+  display: flex;
+  flex-direction: row;
+  background: #000000;
+  color: white;
+  font-size: 18px;
+  padding: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+#view-selector {
+  display: flex;
+  flex-direction: row;
+  background: #000000;
+  border: #000000 2px solid;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.viewbtn {
+  color: white;
+  padding: 1em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  font-size: 1.5em;
+}
+
+.view-selected {
+  background: #292929;
+}
+
+.inst-box {
+  width: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: #1d1d1d 1px solid;
+  border-radius: 5px;
+  border-top: rgb(60, 60, 60) 10px solid;
+  border-right: rgb(60, 60, 60) 10px solid;
+  border-bottom: rgb(34, 34, 34) 10px solid;
+  border-left: rgb(34, 34, 34) 10px solid;
+}
+
+.centre-box {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.inst-box p {
+  color: #ba0000;
+  font-size: 25px;
+}
+
+#compass-cont {
+  display: none;
+}
+
+.fa-chevron-right {
+  text-shadow: 1px 1px 10px rgba(2, 2, 2, 0.25);
+}
+
+.fa-chevron-left {
+  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.25);
+}
+
+.fa-chevrons-right {
+  text-shadow: 1px 1px 10px rgba(2, 2, 2, 0.25);
+}
+
+.fa-chevrons-left {
+  text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.25);
+}

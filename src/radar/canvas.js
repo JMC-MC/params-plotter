@@ -28,36 +28,39 @@ export function init() {
   //Config Canvas
   // When browser is resized keep ownship in centre and other ships in same relative position
   view.onResize = function (event) {
-    // if ($('#radar').is(':visible')) {
-    console.log('resize fired');
-    // Update centre position.
     params.centX = myCanvas.getBoundingClientRect().width / 2;
     params.centY = myCanvas.getBoundingClientRect().height / 2;
     // Check if a scenario has been loaded yet
     if (shipsAfloat) {
-      Draw.radarRings(project, params.centX, params.centY, params.onemile);
       if (TSS) {
         TSSHandler.updatePositionOccupied(
           TSS.trafficLanes.occupied.position.add(event.delta.divide(2)),
           TSS
         );
-        Draw.TSS(TSS);
       }
       if (NC) {
         NCHandler.updatePositionOccupied(
           NC.lanes.occupied.position.add(event.delta.divide(2)),
           NC
         );
-        Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
       }
       for (var i = 0; i < shipsAfloat.length; i++) {
         var ship = shipsAfloat[i];
         ship.position = ship.position.add(event.delta.divide(2));
         ship.vecEnd = ship.vecEnd.add(event.delta.divide(2));
+      }
+      // Draw all elements
+
+      Draw.radarRings(project, params.centX, params.centY, params.onemile);
+      if (TSS) Draw.TSS(TSS);
+      if (NC)
+        Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
+      Draw.ship(shipsAfloat[0], params.shipVctrLngth, params.onemile);
+      for (var i = 1; i < shipsAfloat.length; i++) {
+        var ship = shipsAfloat[i];
         Draw.ship(ship, params.shipVctrLngth, params.onemile);
       }
     }
-    // }
   };
 
   //Adjust ships with mouse events
@@ -146,52 +149,6 @@ export function reset() {
     Draw.radarRings(project, params.centX, params.centY, params.onemile);
   }
   // If not visible the above will happen when changing to the radar screen
-}
-
-export function reDrawRadar() {
-  clear();
-  const newCent = new Point(
-    myCanvas.getBoundingClientRect().width / 2,
-    myCanvas.getBoundingClientRect().height / 2
-  );
-  const oldCent = new Point(params.centX, params.centY);
-  const delta = newCent.subtract(oldCent);
-  if (delta.x != 0 || delta.y != 0) {
-    project.activeLayer.removeChildren();
-    console.log('This is where the problem starts');
-    // Update centre position.
-    params.centX = newCent.x;
-    params.centY = newCent.y;
-    // Check if a scenario has been loaded yet
-    if (shipsAfloat) {
-      console.log('got to draw');
-      setTimeout(function () {
-        view.update();
-      }, 100); // Delay of 100ms
-
-      Draw.radarRings(project, params.centX, params.centY, params.onemile);
-      // if (TSS) {
-      //   TSSHandler.updatePositionOccupied(
-      //     TSS.trafficLanes.occupied.position.add(delta.divide(2)),
-      //     TSS
-      //   );
-      //   Draw.TSS(TSS);
-      // }
-      // if (NC) {
-      //   NCHandler.updatePositionOccupied(
-      //     NC.lanes.occupied.position.add(delta.divide(2)),
-      //     NC
-      //   );
-      //   Draw.narrowChannel(NC, params.onemile, params.centX, params.centY);
-      // }
-      // for (var i = 0; i < shipsAfloat.length; i++) {
-      //   var ship = shipsAfloat[i];
-      //   ship.position = ship.position.add(delta.divide(2));
-      //   ship.vecEnd = ship.vecEnd.add(delta.divide(2));
-      //   Draw.ship(ship, params.shipVctrLngth, params.onemile);
-      // }
-    }
-  }
 }
 
 // Function to clear the canvas

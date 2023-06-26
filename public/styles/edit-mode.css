@@ -1,0 +1,30 @@
+/* Edit mode */
+#ctrl-bar {
+  display: none;
+  /* padding: 5px; */
+  background-color: #bf1a49;
+}
+
+/* The Close Button */
+.close-ctrl {
+  position: relative;
+  float: right;
+  top: 11px;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Hidden button on intial load */
+
+#edtBttnCntr {
+  display: none;
+}
+
+#bckBttnCntr {
+  display: none;
+}

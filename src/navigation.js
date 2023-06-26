@@ -1,4 +1,3 @@
-import { reDrawRadar, clear } from './radar/canvas';
 // When document is ready
 
 $(function () {
@@ -24,14 +23,6 @@ $(function () {
     $('#rules-view').hide();
     $('#report-view').hide();
     $('#staff-answer').hide();
-    setTimeout(function () {
-      let myCanvas = document.getElementById('myCanvas');
-      view.viewSize = new paper.Size(
-        myCanvas.getBoundingClientRect().width,
-        myCanvas.getBoundingClientRect().height
-      );
-      window.dispatchEvent(new CustomEvent('resize'));
-    }, 1000);
   });
 
   $('#rules-button').on('touchstart mousedown', function () {

@@ -1,0 +1,118 @@
+#display-area {
+  border: 2px solid;
+  border-color: #606060;
+}
+
+#ownship {
+  background-color: #1a9cbf;
+}
+#ship {
+  background-color: #ffffff;
+}
+#ship-blank {
+  background-color: #ffffff;
+  color: white;
+}
+#info-column {
+  background-color: black;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#num-input {
+  background-color: black;
+  color: white;
+}
+
+#radar > div {
+  flex: 0 0 auto;
+}
+
+#radar > #display-area {
+  flex: 1 1 auto;
+  overflow: hidden;
+  border: 0px;
+  border-top: 2px solid #444;
+  border-bottom: 2px solid #444;
+}
+
+#radar #myCanvas {
+  height: 100% !important;
+}
+
+#radar #plus-range,
+#radar #minus-range,
+#radar #plus-vec,
+#radar #minus-vec {
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#radar #plus-range-sec,
+#radar #minus-range-sec,
+#radar #plus-vec-sec,
+#radar #minus-vec-sec {
+  cursor: pointer;
+  padding: 5px 0;
+}
+
+#radar .radarBtnTxt,
+#radar .label {
+  font-size: 14px;
+}
+
+@media (min-width: 601px) {
+  #radar {
+    height: calc(100% - 79px);
+  }
+
+  #radar > #display-area {
+    border: 0px;
+    border-right: 2px solid #444;
+  }
+}
+
+@media (min-width: 601px) {
+  #radar {
+    flex-direction: row;
+  }
+}
+
+.info {
+  color: white;
+  padding: 2.5px;
+}
+
+.title {
+  padding: 5px;
+  color: #000000;
+  margin-top: 5px;
+}
+
+.label {
+  color: #606060;
+  padding: 2.5px;
+}
+
+.arrow {
+  transition: 0.25s ease;
+  font-size: 18px;
+  padding: 5px;
+}
+.arrow-animate {
+  transform: rotate(90deg);
+  transition: 0.25s ease;
+}
+
+.stnd-padding {
+  padding: 2.5px;
+}
+.stnd-margin {
+  margin: 2.5px;
+}
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
