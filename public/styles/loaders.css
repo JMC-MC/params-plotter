@@ -1,0 +1,221 @@
+/* Loader*/
+#loader {
+  position: fixed; /* or absolute */
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin: -100px 0 0 -100px;
+}
+.path {
+  stroke-dasharray: 1000;
+  stroke: #1a9cbf;
+  fill: #000000;
+  animation: dash 20s linear alternate infinite;
+  stroke-width: 6px;
+}
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 10000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.overlay {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 30; /* Sit on top */
+  left: 0;
+  top: 0;
+  background-color: rgb(0, 0, 0);
+  overflow-x: hidden; /* Disable horizontal scroll */
+}
+
+.threeOverlay {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 30; /* Sit on top */
+  left: 0;
+  top: 0;
+  background-color: rgb(0, 0, 0);
+  overflow-x: hidden; /* Disable horizontal scroll */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loaderContainer {
+  height: 100px;
+  width: 100px;
+}
+
+.threeLoader {
+  --s: 75px; /* adjust this to control the size */
+
+  --_d: calc(0.353 * var(--s)); /* 0.353 = sin(45deg)/2 */
+  width: calc(var(--s) + var(--_d));
+  aspect-ratio: 1;
+  display: flex;
+  margin: calc(var(--s) / 3) 0;
+}
+.threeLoader:before,
+.threeLoader:after {
+  content: '';
+  flex: 1;
+  clip-path: polygon(
+    var(--_d) 0,
+    100% 0,
+    100% calc(100% - var(--_d)),
+    calc(100% - var(--_d)) 100%,
+    0 100%,
+    0 var(--_d)
+  );
+  background: conic-gradient(
+    from -90deg at calc(100% - var(--_d)) var(--_d),
+    #23cefd 135deg,
+    #0d4d5f 0 270deg,
+    #1a9cbf 0
+  );
+  animation: load 1.5s infinite cubic-bezier(0, 0.5, 0.5, 1.8) alternate;
+}
+.threeLoader:before {
+  margin-right: calc(var(--_d) / -2 - 1px);
+}
+.threeLoader:after {
+  margin-left: calc(var(--_d) / -2 - 1px);
+  animation-delay: -0.75s;
+}
+@keyframes load {
+  0%,
+  40% {
+    transform: translateY(calc(var(--s) / -4));
+  }
+  60%,
+  100% {
+    transform: translateY(calc(var(--s) / 4));
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes drop {
+  0% {
+    bottom: 0px;
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    bottom: -200px;
+  }
+}
+
+@keyframes wave {
+  0% {
+    background-position: 0 160px;
+    background-size: 170px 300px;
+  }
+
+  100% {
+    background-position: 500px -18px;
+    background-size: 250px 150px;
+  }
+}
+
+#logo {
+  font-size: 60px;
+  vertical-align: middle;
+  font-weight: 100;
+  color: #000000;
+}
+
+.kuhl {
+  margin-top: 5px;
+  width: 88%;
+}
+
+.loader {
+  width: 120px;
+  height: 120px;
+  position: fixed;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  text-align: center;
+  line-height: 120px;
+  font-family: sans-serif;
+  color: #ffffff;
+  font-size: 16px;
+  border-radius: 25px;
+}
+
+.loader span {
+  z-index: 3;
+}
+
+.loader-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 25px;
+  background: transparent repeat-x 0 100px/150px 300px;
+  z-index: 2;
+  animation: wave 1s ease-out forwards;
+}
+
+.drops {
+  -webkit-filter: url('#liquid');
+  filter: url('#liquid');
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+  opacity: 0;
+  animation: fade-in 0.1s linear 0.4s forwards;
+}
+
+.drop1,
+.drop2 {
+  width: 21px;
+  height: 24px;
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: #10a7c1;
+}
+
+.drop1 {
+  width: 115px;
+  height: 98px;
+  bottom: 2px;
+  border-radius: 0;
+}
+
+.drop2 {
+  animation: drop 1.3s cubic-bezier(1, 0.19, 0.66, 0.12) 0.5s infinite;
+}

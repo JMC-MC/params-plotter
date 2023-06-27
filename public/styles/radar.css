@@ -61,23 +61,6 @@
   font-size: 14px;
 }
 
-@media (min-width: 601px) {
-  #radar {
-    height: calc(100% - 79px);
-  }
-
-  #radar > #display-area {
-    border: 0px;
-    border-right: 2px solid #444;
-  }
-}
-
-@media (min-width: 601px) {
-  #radar {
-    flex-direction: row;
-  }
-}
-
 .info {
   color: white;
   padding: 2.5px;
