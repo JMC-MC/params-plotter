@@ -11,7 +11,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(100% - 70px); /* Adjust height for the navbar */
+  height: calc(100% - 70px);
   display: flex;
   justify-content: space-between;
 }
@@ -22,12 +22,11 @@ body {
 }
 
 #radar {
-  height: calc(100% - 70px);
-  display: flex;
   flex-direction: column;
 }
 
 #rules-view {
+  overflow: scroll;
   color: white;
 }
 /* Scale canvas with resize attribute to full size */

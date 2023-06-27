@@ -32,8 +32,6 @@
   flex: 1 1 auto;
   overflow: hidden;
   border: 0px;
-  border-top: 2px solid #444;
-  border-bottom: 2px solid #444;
 }
 
 #radar #myCanvas {

@@ -59,6 +59,8 @@ camera.position.set(30, 30, 100);
 camera.add(audioListener);
 
 function buildThreeDRendering() {
+  // If on the lookout view whilst building show loader overlay
+  if ($('#lookOut').css('visibility') !== 'hidden') $('.overlay').show();
   initControls();
   // Setup elevation from environment variable
   switch (params.environment) {
@@ -307,7 +309,8 @@ function buildThreeDRendering() {
       Light.shipSwitch(dark);
 
       animate();
-      $('.threeOverlay').hide();
+      // Reveal canvas by showing overlay
+      $('.overlay').hide();
     } catch (err) {
       console.log(err);
     }
@@ -328,7 +331,7 @@ function animate() {
       // Update ships
       gameController.updateShips(interval, params, shipsAfloat, TSS, NC);
       // Only call if three canvas is visible
-      if ($('#lookOut').is(':visible')) {
+      if ($('#lookOut').css('visibility') !== 'hidden') {
         if (dark) renderBloom();
         render();
         controlCamera();

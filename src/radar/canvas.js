@@ -142,7 +142,7 @@ export function init() {
 
 export function reset() {
   // If canvas is visible
-  if ($('#radar').is(':visible')) {
+  if ($('#radar').css('visibility') !== 'hidden') {
     params.centX = myCanvas.getBoundingClientRect().width / 2;
     params.centY = myCanvas.getBoundingClientRect().height / 2;
     getScale(myCanvas);
