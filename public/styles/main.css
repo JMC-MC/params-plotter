@@ -19,7 +19,6 @@ body {
 #lookOut {
   max-height: 100%;
   overflow: hidden;
-  /* display: none; */
 }
 
 #radar {
@@ -29,7 +28,6 @@ body {
 }
 
 #rules-view {
-  /* display: none; */
   color: white;
 }
 /* Scale canvas with resize attribute to full size */
