@@ -50,6 +50,13 @@
   font-size: 6em;
   z-index: 5;
 }
+/* CSS for mobile screens */
+@media only screen and (max-width: 480px) {
+  #right-arrow,
+  #left-arrow {
+    font-size: 3em;
+  }
+}
 
 .compass {
   width: 100%;
@@ -67,7 +74,6 @@
 .lookoutInfo {
   height: fit-content;
   width: 190px;
-  height: 127px;
   position: absolute;
   bottom: 0;
   margin-left: auto;
@@ -75,7 +81,9 @@
   left: 0;
   right: 0;
   z-index: 2;
-  border-radius: 30%;
+  border-bottom: rgb(28, 28, 28) solid 31px;
+  border-top-left-radius: 30%;
+  border-top-right-radius: 30%;
 }
 
 #orientator {

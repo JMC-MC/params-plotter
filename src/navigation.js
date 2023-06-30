@@ -1,11 +1,6 @@
 // When document is ready
-$(function () {
-  // Radar screen is active on load
-  $('#radar-button').addClass('activeclicked'); // Make radar-button active on page load
-  // Switch Screens
-  $('#radar').css('visibility', 'visible');
-  $('#lookOut').css('visibility', 'hidden');
-  $('#rules-view').css('visibility', 'hidden');
+export function initNavigation() {
+  resetNavigation();
 
   // Navigation
   $('#lookout-button').on('touchstart mousedown', function () {
@@ -36,9 +31,20 @@ $(function () {
   $('#question-button').on('touchstart mousedown', function () {
     window.parent.postMessage(window.shipsAfloat, '*');
   });
+}
 
-  function setActiveMenu(item) {
-    $('.activeclicked').removeClass('activeclicked');
-    $(item).addClass('activeclicked');
-  }
-});
+export function resetNavigation() {
+  $('#lookout-button').removeClass('activeclicked');
+  $('#rules-button').removeClass('activeclicked');
+  // Radar screen is active on load
+  $('#radar-button').addClass('activeclicked'); // Make radar-button active on page load
+  // Switch Screens
+  $('#radar').css('visibility', 'visible');
+  $('#lookOut').css('visibility', 'hidden');
+  $('#rules-view').css('visibility', 'hidden');
+}
+
+function setActiveMenu(item) {
+  $('.activeclicked').removeClass('activeclicked');
+  $(item).addClass('activeclicked');
+}

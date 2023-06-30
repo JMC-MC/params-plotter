@@ -2,7 +2,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { mark, unmark } from 'markjs';
 //OWN MODULES
-import './navigation.js';
+import { initNavigation, resetNavigation } from './navigation.js';
 import * as TSSHandler from './utils/tss-handler.js';
 import * as NCHandler from './utils/nc-handler.js';
 import * as Calculate from './utils/calculators.js';
@@ -11,9 +11,9 @@ import * as RadarControls from './radar/controls.js';
 import * as RulesReader from './rulesReader.js';
 import * as PprCanvas from './radar/canvas.js';
 import { radToDeg } from 'three/src/math/MathUtils.js';
-import { buildThreeDRendering } from './lookout/threeDisplay.js';
+import { buildThreeDRendering, clearScene } from './lookout/threeDisplay.js';
 import { startBearingChecker } from './utils/bearing-handler.js';
-import { clearScene } from './lookout/threeDisplay.js';
+import { resetControls } from './lookout/controls.js';
 
 //DECLARE VARIABLES
 
@@ -48,6 +48,7 @@ window.addEventListener(
 import('paper').then(({ default: paper }) => {
   paper.install(window);
   window.onload = function () {
+    initNavigation();
     PprCanvas.init();
     RadarControls.init();
     RulesReader.init();
@@ -58,6 +59,7 @@ import('paper').then(({ default: paper }) => {
 const loadData = function (scenarioData) {
   if (shipsAfloat) resetScenarioViewer();
   importScenario(scenarioData);
+  console.log(shipsAfloat);
   // Create deep nested clone of shipsAfloat for record of original scenario
   orgShipsAfloat = cloneDeep(shipsAfloat);
   scenarioStart = Date.now();
@@ -68,6 +70,12 @@ const loadData = function (scenarioData) {
 
 // Import scenario data
 const importScenario = function (data) {
+  // Check if a scenario is already loaded
+  if (shipsAfloat) {
+    // Reset scenario
+    resetScenarioViewer();
+  }
+  resetNavigation();
   params.environment = data.env;
   // Find vector from gen centre to screen center
   const screenCenter = new Point(params.centX, params.centY);
@@ -222,7 +230,7 @@ const importScenario = function (data) {
 
 // Clear scenario data
 const resetScenarioViewer = function () {
-  //Reset Scenario Data
+  // //Reset Scenario Data
   TSS = null;
   NC = null;
   orgShipsAfloat = null;
@@ -230,10 +238,10 @@ const resetScenarioViewer = function () {
   scenarioStart = null;
   // Reset params object
   params.shipVctrLngth = 6;
-  params.onemile = 0;
   params.resVis = false;
   params.play = true;
   params.scale = 12;
+
   //Reset Radar
   PprCanvas.clear();
   PprCanvas.reset();
@@ -241,6 +249,7 @@ const resetScenarioViewer = function () {
   RadarControls.updateVecLengthValue();
   //Reset Lookout
   clearScene();
+  resetControls();
 };
 
 // Once document is loaded show

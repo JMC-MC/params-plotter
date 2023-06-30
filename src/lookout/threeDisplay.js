@@ -524,6 +524,7 @@ export function clearScene() {
       scene.remove(object);
     }
   });
+  renderer.clear();
 }
 
 export { buildThreeDRendering, scene, parameters };

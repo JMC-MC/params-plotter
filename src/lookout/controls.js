@@ -143,3 +143,20 @@ export function initControls() {
     playAudio();
   });
 }
+
+export function resetControls() {
+  parameters.zoomed = false;
+  $('#eye-view').addClass('view-selected');
+  $('#zoom-view').removeClass('view-selected');
+  $('#compass-view').removeClass('view-selected');
+  if ($('#compass-cont').is(':visible')) $('#compass-cont').toggle();
+  if ($('#instrument-panel').is(':visible'));
+  else $('#instrument-panel').toggle();
+  // Change arrows
+  $('#left-arrow i')
+    .addClass('fa-duotone fa-chevrons-left')
+    .removeClass('fa-regular fa-chevron-left');
+  $('#right-arrow i')
+    .addClass('fa-duotone fa-chevrons-right')
+    .removeClass('fa-regular fa-chevron-right');
+}

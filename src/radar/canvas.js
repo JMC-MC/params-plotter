@@ -7,17 +7,6 @@ import { Point } from 'paper/dist/paper-core';
 
 export function init() {
   let myCanvas = document.getElementById('myCanvas');
-  myCanvas.addEventListener(
-    'webglcontextlost',
-    function (event) {
-      event.preventDefault(); // prevent default to allow attempting to restore the context later
-      // handle context loss - this could involve deleting and recreating your Paper.js project,
-      // or it could involve calling some custom cleanup and restoration code if you have it
-      console.log('context lost');
-    },
-    false
-  );
-
   // Create an empty project and a view for the canvas:
   paper.setup(myCanvas);
   let tool = new Tool();
@@ -141,14 +130,8 @@ export function init() {
 }
 
 export function reset() {
-  // If canvas is visible
-  if ($('#radar').css('visibility') !== 'hidden') {
-    params.centX = myCanvas.getBoundingClientRect().width / 2;
-    params.centY = myCanvas.getBoundingClientRect().height / 2;
-    getScale(myCanvas);
-    Draw.radarRings(project, params.centX, params.centY, params.onemile);
-  }
-  // If not visible the above will happen when changing to the radar screen
+  // Reset onemile value
+  getScale();
 }
 
 // Function to clear the canvas
@@ -158,7 +141,7 @@ export function clear() {
 }
 
 //Get shortest dimension
-function getScale(myCanvas) {
+export function getScale() {
   if (
     myCanvas.getBoundingClientRect().height <
     myCanvas.getBoundingClientRect().width
