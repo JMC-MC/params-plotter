@@ -31,3 +31,13 @@ export function distanceToThreeCanvas(pos) {
   var b = pos * 1000;
   return b;
 }
+
+export function NumbersInObject(obj) {
+  for (let key in obj) {
+    if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+      NumbersInObject(obj[key]);
+    } else if (!isNaN(obj[key])) {
+      obj[key] = Number(obj[key]);
+    }
+  }
+}

@@ -1,7 +1,7 @@
 // When document is ready
 export function initNavigation() {
   resetNavigation();
-
+  $('#ctrl-bar').show();
   // Navigation
   $('#lookout-button').on('touchstart mousedown', function () {
     setActiveMenu(this);

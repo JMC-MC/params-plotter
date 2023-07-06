@@ -1,6 +1,6 @@
 /* Edit mode */
 #ctrl-bar {
-  display: none;
+  display: block;
   /* padding: 5px; */
   background-color: #bf1a49;
 }

@@ -2,6 +2,7 @@ import * as Draw from './drawPaperElements.js';
 import * as TSSHandler from '../utils/tss-handler.js';
 import * as NCHandler from '../utils/nc-handler.js';
 import * as RadarControls from './controls.js';
+import * as Calculate from '../utils/calculators.js';
 import { shipsAfloat, params, TSS, NC } from '../app.js';
 import { Point } from 'paper/dist/paper-core';
 
@@ -102,7 +103,7 @@ export function init() {
         if (ship.posSelected & (ship.type != 'Own Ship')) {
           ship.position = ship.position.add(event.delta);
           ship.vecEnd = ship.vecEnd.add(event.delta);
-        } else if (ship.vecSelected) {
+        } else if (ship.vecSelected && speedCheck(ship)) {
           ship.vecEnd = ship.vecEnd.add(event.delta);
         }
         Calculate.CPA(
@@ -153,4 +154,10 @@ export function getScale() {
   // Set shortest dim at 24nm
   // This creates a 12nm range scale
   params.onemile = shortDim / (params.scale * 2);
+}
+
+function speedCheck(ship) {
+  if (ship.speed < ship.maxSpeed && ship.speed > ship.minSpeed) {
+    return true;
+  } else return false;
 }

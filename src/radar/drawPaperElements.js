@@ -341,6 +341,11 @@ export function ship(ship, shipVctrLngth, onemile) {
           onemile
         ).toFixed(1)
       );
+      ship.speed = Calculate.speedInKts(
+        shipsAfloat[0].vector.length,
+        shipVctrLngth,
+        onemile
+      ).toFixed(1);
       $('#height').text(myCanvas.height);
       $('#width').text(myCanvas.width);
     });

@@ -10,6 +10,7 @@ import * as Draw from './radar/drawPaperElements.js';
 import * as RadarControls from './radar/controls.js';
 import * as RulesReader from './rulesReader.js';
 import * as PprCanvas from './radar/canvas.js';
+import { formToScenario } from './utils/form-to-scenario.js';
 import { radToDeg } from 'three/src/math/MathUtils.js';
 import { buildThreeDRendering, clearScene } from './lookout/threeDisplay.js';
 import { startBearingChecker } from './utils/bearing-handler.js';
@@ -39,7 +40,10 @@ window.addEventListener(
   'message',
   function (event) {
     hideScenario();
-    loadData(event.data);
+    // Convert all number values to number types
+    const scenarioData = formToScenario(event.data);
+    // console.log(scenarioData);
+    loadData(scenarioData);
   },
   false
 );
