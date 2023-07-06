@@ -98,7 +98,7 @@ function buildThreeDRendering() {
         shipsAfloat.slice(1).forEach((ship) => {
           proms.push(
             Load.shipModels(
-              'assets/' + ship.type + '.glb',
+              'assets/ship_models/' + ship.type + '.glb',
               ship.relposXnm,
               ship.relposYnm,
               ship.course,
@@ -112,7 +112,7 @@ function buildThreeDRendering() {
           NC.markers.relPositionsPort.forEach((marker, i) => {
             proms.push(
               Load.buoyModels(
-                'assets/portMarker.glb',
+                'assets/buoy_models/portMarker.glb',
                 marker.x,
                 marker.y,
                 `port_marker_${i}`,
@@ -126,7 +126,7 @@ function buildThreeDRendering() {
           NC.markers.relPositionsStarboard.forEach((marker, i) => {
             proms.push(
               Load.buoyModels(
-                'assets/stbMarker.glb',
+                'assets/buoy_models/stbMarker.glb',
                 marker.x,
                 marker.y,
                 `starboard_marker_${i}`,
