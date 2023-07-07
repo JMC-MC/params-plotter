@@ -34,15 +34,14 @@ let params = {
   scale: 12,
   animatePaperCanvas: null,
 };
-
+let scenarioData = '';
 // Listener for data
 window.addEventListener(
   'message',
   function (event) {
     hideScenario();
     // Convert all number values to number types
-    const scenarioData = formToScenario(event.data);
-    // console.log(scenarioData);
+    scenarioData = formToScenario(event.data);
     loadData(scenarioData);
   },
   false
@@ -63,33 +62,31 @@ import('paper').then(({ default: paper }) => {
 const loadData = function (scenarioData) {
   if (shipsAfloat) resetScenarioViewer();
   importScenario(scenarioData);
-  console.log(shipsAfloat);
   // Create deep nested clone of shipsAfloat for record of original scenario
   orgShipsAfloat = cloneDeep(shipsAfloat);
   scenarioStart = Date.now();
   buildThreeDRendering();
   startBearingChecker(shipsAfloat);
   revealScenario();
+  console.log(shipsAfloat);
 };
 
 // Import scenario data
 const importScenario = function (data) {
-  // Check if a scenario is already loaded
-  if (shipsAfloat) {
-    // Reset scenario
-    resetScenarioViewer();
-  }
-  resetNavigation();
   params.environment = data.env;
   // Find vector from gen centre to screen center
   const screenCenter = new Point(params.centX, params.centY);
-  // Intialise paperjs point
-  data.center = new Point(data.center[0], data.center[1]);
+  if (!(data.center instanceof Point)) {
+    // Only initialize if data.center is not already a Point
+    data.center = new Point(data.center[0], data.center[1]);
+  }
   const delta = screenCenter.subtract(data.center);
   // Reposition all ships based on screen centre
   data.genShipsAfloat.map((ship) => {
     // Intialise paperjs point
-    ship.position = new Point(ship.position.x, ship.position.y);
+    if (!(ship.position instanceof Point)) {
+      ship.position = new Point(ship.position.x, ship.position.y);
+    }
     ship.position = ship.position.add(delta);
     // Scale positions
     if (ship.type != 'Own Ship') {
@@ -254,6 +251,7 @@ const resetScenarioViewer = function () {
   //Reset Lookout
   clearScene();
   resetControls();
+  resetNavigation();
 };
 
 // Once document is loaded show

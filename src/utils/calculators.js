@@ -76,3 +76,16 @@ function recip(bearing) {
   if (bearing > 180) return bearing - 180;
   else return bearing + 180;
 }
+
+export function targetCourse(BearingOwnToT, AFTSHRads) {
+  const targetCourse = reciprocal_bearing(BearingOwnToT) - AFTSHRads;
+  const normalizedTargetCourse =
+    targetCourse >= 0
+      ? targetCourse % (2 * Math.PI)
+      : (targetCourse % (2 * Math.PI)) + 2 * Math.PI;
+  return normalizedTargetCourse;
+}
+
+function reciprocal_bearing(bearing) {
+  return (bearing + Math.PI) % (2 * Math.PI);
+}

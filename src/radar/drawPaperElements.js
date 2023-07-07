@@ -341,11 +341,6 @@ export function ship(ship, shipVctrLngth, onemile) {
           onemile
         ).toFixed(1)
       );
-      ship.speed = Calculate.speedInKts(
-        shipsAfloat[0].vector.length,
-        shipVctrLngth,
-        onemile
-      ).toFixed(1);
       $('#height').text(myCanvas.height);
       $('#width').text(myCanvas.width);
     });
@@ -386,4 +381,58 @@ export function TSS(TSS) {
   otherTrafficLaneBoundary.strokeWidth = 1;
   otherTrafficLaneBoundary.dashArray = [10, 5];
   otherTrafficLaneBoundary.strokeColor = '#bf1a80';
+}
+
+export function drawAnnularSector(
+  center,
+  minRadius,
+  maxRadius,
+  startAngle,
+  endAngle
+) {
+  // Adjust for Paper.js's coordinate system
+  startAngle = 360 - startAngle;
+  endAngle = 360 - endAngle;
+
+  var outerFrom = new Point(
+    center.x + maxRadius * Math.cos((startAngle * Math.PI) / 180),
+    center.y + maxRadius * Math.sin((startAngle * Math.PI) / 180)
+  );
+  var outerThrough = new Point(
+    center.x +
+      maxRadius * Math.cos((((startAngle + endAngle) / 2) * Math.PI) / 180),
+    center.y +
+      maxRadius * Math.sin((((startAngle + endAngle) / 2) * Math.PI) / 180)
+  );
+  var outerTo = new Point(
+    center.x + maxRadius * Math.cos((endAngle * Math.PI) / 180),
+    center.y + maxRadius * Math.sin((endAngle * Math.PI) / 180)
+  );
+  var outerArc = new Path.Arc(outerFrom, outerThrough, outerTo);
+
+  var innerFrom = new Point(
+    center.x + minRadius * Math.cos((endAngle * Math.PI) / 180),
+    center.y + minRadius * Math.sin((endAngle * Math.PI) / 180)
+  );
+  var innerThrough = new Point(
+    center.x +
+      minRadius * Math.cos((((startAngle + endAngle) / 2) * Math.PI) / 180),
+    center.y +
+      minRadius * Math.sin((((startAngle + endAngle) / 2) * Math.PI) / 180)
+  );
+  var innerTo = new Point(
+    center.x + minRadius * Math.cos((startAngle * Math.PI) / 180),
+    center.y + minRadius * Math.sin((startAngle * Math.PI) / 180)
+  );
+  var innerArc = new Path.Arc(innerFrom, innerThrough, innerTo);
+
+  var path = new Path();
+  path.addSegments(outerArc.segments);
+  path.reverse();
+  path.addSegments(innerArc.segments);
+  path.closePath();
+
+  path.fillColor = 'yellow'; // or any color you want
+
+  return path;
 }
