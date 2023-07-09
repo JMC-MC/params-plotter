@@ -105,6 +105,9 @@ export function init() {
           const orgPos = ship.position;
           const newPos = orgPos.add(event.delta);
           //Range, AFOSH and AFTSH checks
+          console.log(`Range ${rangeCheck(newPos, ship)}`);
+          console.log(`AFOSH ${AFOSHCheck(newPos, ship)}`);
+          console.log(`AFTSH ${AFTSHPosCheck(newPos, ship)}`);
           if (
             rangeCheck(newPos, ship) &&
             AFOSHCheck(newPos, ship) &&
@@ -216,6 +219,7 @@ function AFOSHCheck(newPos, { AFOSH: { min, max } }) {
     if (workingAngle < -180) workingAngle = 360 + workingAngle;
   }
   const newAFOSH = workingAngle;
+  console.log(newAFOSH);
   if (newAFOSH <= max && newAFOSH >= min) {
     return true;
   } else return false;
