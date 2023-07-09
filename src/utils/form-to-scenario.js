@@ -21,7 +21,7 @@ export function formToScenario(formData) {
   }
   // OwnShip //
   scenarioData.genShipsAfloat[0].speed =
-    (formData.maxSpeed - formData.minSpeed) / 2;
+    (formData.maxSpeed - formData.minSpeed) / 2 + formData.range.min;
   scenarioData.genShipsAfloat[0].speedLims = {
     min: formData.minSpeed,
     max: formData.maxSpeed,
@@ -59,7 +59,7 @@ export function formToScenario(formData) {
   // Target Limitations //
 
   scenarioData.genShipsAfloat[1].rangeLims = { ...formData.range };
-  scenarioData.genShipsAfloat[1].speedLims = { ...formData.speed };
+  scenarioData.genShipsAfloat[1].speedLims = formData.vessels.speedLims;
   scenarioData.genShipsAfloat[1].AFOSH = { ...formData.AFOSH };
   scenarioData.genShipsAfloat[1].AFTSH = { ...formData.AFTSH };
 

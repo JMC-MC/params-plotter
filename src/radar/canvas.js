@@ -234,7 +234,6 @@ function AFTSHPosCheck(newPos, { AFTSH: { min, max }, vector }) {
     if (workingAngle < -180) workingAngle = 360 + workingAngle;
   }
   const newAFTSH = workingAngle;
-  console.log(newAFTSH);
   if (newAFTSH <= max && newAFTSH >= min) {
     return true;
   } else {
@@ -256,7 +255,6 @@ function AFTSHVecCheck(newVec, { position, AFTSH: { min, max } }) {
     if (workingAngle < -180) workingAngle = 360 + workingAngle;
   }
   const newAFTSH = workingAngle;
-  console.log(newAFTSH);
   if (newAFTSH <= max && newAFTSH >= min) {
     return true;
   } else {

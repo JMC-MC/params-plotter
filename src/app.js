@@ -30,7 +30,7 @@ let params = {
   shipVctrLngth: 6,
   onemile: 0,
   resVis: false,
-  play: true,
+  play: false,
   scale: 12,
   animatePaperCanvas: null,
 };
